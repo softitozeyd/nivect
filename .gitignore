@@ -1,0 +1,6 @@
+*.pt
+*.zip
+snapshots/
+venv/
+__pycache__/
+.DS_Store
