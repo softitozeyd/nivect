@@ -28,7 +28,7 @@ Arkadasinizin uygulamasi IDE'den calisirken:
 
 | Ayar | Deger |
 |---|---|
-| JDBC URL | `jdbc:postgresql://localhost:5432/nivect` |
+| JDBC URL | `jdbc:postgresql://localhost:15432/nivect` |
 | DB kullanicisi | `nivect` |
 | DB parolasi | `.env` icindeki `POSTGRES_PASSWORD` |
 | Redis host / port | `localhost` / `6379` |
@@ -103,6 +103,16 @@ degistirmek mevcut DB kullanicisinin parolasini degistirmez.
 - Host portlari sadece 127.0.0.1'e baglidir. Bu yerel gelistirme paketidir;
   baska bilgisayar kendi Compose'unu calistirir. Internet/LAN yayini veya
   fiziksel PLC/siren komutu bu paketin parcasi degildir.
+
+## Dogrulama — 24 Ekim 2026
+
+Uc servis Docker Desktop uzerinde healthy durumuna geldi.
+`scripts/test-infra.ps1` ile PostgreSQL SELECT 1, Redis PING ve MQTT QoS 1
+publish/subscribe testleri gecti. Bu sonuc Spring Boot/model entegrasyon testi
+veya veri kaybi dayaniklilik testi degildir.
+
+Host PostgreSQL portu 15432 secildi; bu bilgisayarda 5432 zaten baska bir
+servis tarafindan kullaniliyor. Container ici PostgreSQL portu 5432 kalir.
 
 ## Resmi kaynaklar
 
