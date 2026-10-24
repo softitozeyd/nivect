@@ -1,7 +1,7 @@
 # Yerel gelistirme altyapisi
 
-Bu paket sadece PostgreSQL, Redis ve MQTT broker kurar. Spring Boot, model,
-canli panel veya PLC uygulamasi henuz bu akisa bagli degildir.
+Bu paket PostgreSQL, Redis ve MQTT broker ile Spring Boot backend'i calistirir.
+Model/kamera, canli panel ve PLC baglantisi bu kurulumun parcasi degildir.
 
 ## Baslatma (PowerShell)
 
@@ -18,11 +18,31 @@ Kurulum betigi var olan `.env` dosyasini degistirmez. Her gelistirici kendi
 bilgisayarinda calistirir. Parolalari commit etmeyin; `.env.example` yalnizca
 anahtarlari belgeler. Veri dosyalari named volume icinde kalir.
 
+## Backend'i Docker ile baslatma
+
+Java veya Maven'i bilgisayara kurmak gerekmez. Ilk build Java/Maven imajlarini
+ve Maven bagimliliklarini indirir:
+
+```powershell
+docker compose --profile app up -d --build --wait --wait-timeout 180
+docker compose --profile app ps
+powershell -ExecutionPolicy Bypass -File ./scripts/test-backend.ps1
+```
+
+Backend: `http://localhost:8080`, saglik: `/actuator/health`.
+`BACKEND_PORT` ile host portu degistirilebilir; test betigi varsayilan 8080'i
+kullanir. Build asamasinda Java testleri calisir. Uc altyapi servisi icin
+onceki profilsiz `up` komutu kullanilmaya devam edilebilir.
+
+Backend endpoint'leri su an kullanici kimlik dogrulamasi icermez. Bu Compose
+paketi host portlarini yalnizca bu bilgisayara baglar; uretim yayini degildir.
+
 ## Spring Boot baglantisi
 
 Ekip tarafindan teyit edilen temel: Java 21 + Maven. Maven Wrapper dosyalari
 (`mvnw`, `mvnw.cmd`, `.mvn/`) Spring Boot iskeletiyle birlikte repoya alinmali.
-Spring Boot surumu iskelet geldikten sonra dogrulanacak.
+Mevcut iskelet Spring Boot 3.3.4 kullanir. Bu degisiklikte framework surumu
+yukseltilmedi.
 
 Arkadasinizin uygulamasi IDE'den calisirken:
 
@@ -37,14 +57,16 @@ Arkadasinizin uygulamasi IDE'den calisirken:
 | MQTT kullanicisi | `nivect` |
 | MQTT parolasi | `.env` icindeki `MQTT_PASSWORD` |
 
-`.env` dosyasini Spring Boot kendiliginden okumaz. Bu degerler IDE run
-configuration ortam degiskenlerine alinmali ve uygulama ayarlari tarafindan
-okunmalidir. Spring Boot surumu ve MQTT kutuphanesi iskelet gelince eslestirilecek.
-Uygulama ileride Compose'a alinirsa hostlar `postgres`, `redis`, `mosquitto`
-olur; container icinde `localhost` kullanilmaz.
+`application.yml` icindeki acik `spring.config.import` ayari sayesinde IDE'de
+calisma dizini repo koku ise yerel `.env` okunur. Baska dizinden baslatilirsa
+ortam degiskenleri IDE run configuration'a eklenmelidir. Sifrelerin varsayilan
+degeri yoktur; eksik sifreyle uygulama baslamaz. Compose backend'e degerleri
+environment olarak verir; `.env` Docker imajina kopyalanmaz.
+Docker icinde hostlar `postgres`, `redis`, `mosquitto` ve PostgreSQL portu 5432'dir.
 
-Tablolari Spring Boot tarafindaki migration dosyalari yonetecek. Docker init SQL
-ile ikinci bir sema kaynagi olusturulmaz. TimescaleDB bu ilk pakete dahil degildir.
+Mevcut iskelet `ddl-auto: update` kullanir; surumlu migration henuz eklenmedi.
+Docker init SQL ile ikinci bir sema kaynagi olusturulmaz. TimescaleDB bu pakete
+dahil degildir.
 
 ## Testler
 
@@ -87,14 +109,19 @@ docker compose logs --tail 50
 PostgreSQL ilk acilista kullanici ve DB olusturur; `.env` parolasini sonradan
 degistirmek mevcut DB kullanicisinin parolasini degistirmez.
 
-## Mesaj ve dayaniklilik sozlesmesi (entegrasyonda tamamlanacak)
+## Mesaj ve kalan dayaniklilik isleri
 
-- Onerilen sonuc topic'i: `nivect/v1/inspections`; QoS 1, retain false.
+- Backend'in varsayilan sonuc topic'i: `production/+/inspections`;
+  ornek yayin: `production/line-1/inspections`, QoS 1, retain false.
+  `MQTT_TOPIC` ve `MQTT_CLIENT_ID` ile ayarlanabilir. Her aktif backend
+  icin farkli client ID kullanilmalidir.
 - Ayni olayin yeniden gonderiminde `event_id` korunur. JSON semasi Python ve
   backend gelistiricileriyle birlikte kesinlestirilmelidir.
-- Redis Streams consumer group kullanir; DB transaction commit sonrasi XACK.
-  Pending mesajlar yeniden baslamada alinmali, DB benzersiz olay kimligiyle
-  tekrar yazmayi engellemelidir.
+- Mevcut worker Redis List'ten en fazla 500 kaydi saniyede bir alir. Listeden
+  cikarma DB commit oncesindedir; DB hatasi veya proses kaybinda kayit kaybi
+  riski surer. Bu degisiklik baglanti entegrasyonudur, tam dayaniklilik cozumunu
+  icermez. Sonraki adim: Streams consumer group, commit sonrasi XACK, pending
+  kurtarma ve DB benzersiz olay kimligi.
 - MQTT aboneligi kalici client/session ve kontrollu ACK ile tasarlanmalidir.
   Broker onayi, DB'ye kaydedildi onayi degildir.
 - Redis AOF everysec ve Mosquitto persistence aciktir. Ani guc kaybinda kayip
@@ -103,6 +130,16 @@ degistirmek mevcut DB kullanicisinin parolasini degistirmez.
 - Host portlari sadece 127.0.0.1'e baglidir. Bu yerel gelistirme paketidir;
   baska bilgisayar kendi Compose'unu calistirir. Internet/LAN yayini veya
   fiziksel PLC/siren komutu bu paketin parcasi degildir.
+
+Mevcut backend'in kabul ettigi ornek JSON (model tarafiyla kesinlestirilecek):
+
+```json
+{"lineCode":"line-1","capOk":true,"labelOk":true,"liquidLevelOk":true,"imagePath":null}
+```
+
+Su an karar PASS/FAIL; REVIEW/INVALID ve eksik alan dogrulamasi henuz yoktur.
+Etiket kontrolu planlanan kapsamda olmayabilir; model ekibiyle anlasilmadan
+bu ornek bir kalite kabul standardi olarak kullanilmamalidir.
 
 ## Dogrulama — 24 Ekim 2026
 
@@ -120,6 +157,14 @@ Bu degisiklik veritabani adi, kullanicisi ve parolasini degistirmez.
 Redis PING ve MQTT publish/subscribe testleri yeniden gecti. Bilgisayardaki
 ayri Windows PostgreSQL 18 servisi kullanici onayiyla durduruldu; mevcut
 verileri silinmedi.
+
+## Backend baglanti testi
+
+Backend baglanti dogrulamasi (24 Ekim 2026): Java 21 Maven verify build'i
+3 test, 0 hata ile gecti. Docker'da dort servis healthy oldu. Test betigi MQTT
+uzerinden bir FAIL ve HTTP uzerinden bir PASS kaydi gonderdi; ikisi PostgreSQL'de
+bulundu ve FAIL kaydi failures API'sinden okundu. Ornekler test mesajlaridir;
+gercek model/dogruluk veya kesintide veri kaybi deneyi degildir.
 
 ## Resmi kaynaklar
 

@@ -1,6 +1,40 @@
 name: nivect-dev
 
 services:
+  backend:
+    profiles: [app]
+    build: .
+    restart: unless-stopped
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: ${POSTGRES_DB:-nivect}
+      POSTGRES_USER: ${POSTGRES_USER:-nivect}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Run scripts/setup-dev.ps1 first}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:?Run scripts/setup-dev.ps1 first}
+      MQTT_URL: tcp://mosquitto:1883
+      MQTT_USERNAME: ${MQTT_USERNAME:-nivect}
+      MQTT_PASSWORD: ${MQTT_PASSWORD:?Run scripts/setup-dev.ps1 first}
+      MQTT_CLIENT_ID: ${MQTT_CLIENT_ID:-spring-bottle-qc-backend}
+      MQTT_TOPIC: ${MQTT_TOPIC:-production/+/inspections}
+    ports:
+      - "127.0.0.1:${BACKEND_PORT:-8080}:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      mosquitto:
+        condition: service_healthy
+    healthcheck:
+      test: [CMD-SHELL, 'wget -q -O /dev/null http://127.0.0.1:8080/actuator/health']
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+
   postgres:
     image: postgres:17.11-alpine
     restart: unless-stopped

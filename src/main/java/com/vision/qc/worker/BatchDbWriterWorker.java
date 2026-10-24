@@ -8,6 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import reactor.core.scheduler.Schedulers;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,9 +25,11 @@ public class BatchDbWriterWorker {
 
     private static final String REDIS_BUFFER_KEY = "buffer:bottle_inspections";
     private static final int BATCH_SIZE = 500;
+    private final AtomicBoolean flushing = new AtomicBoolean();
 
     @Scheduled(fixedRate = 1000) // Her 1 saniyede bir çalışır
     public void flushRedisToDatabase() {
+        if (!flushing.compareAndSet(false, true)) return;
         redisTemplate.opsForList().size(REDIS_BUFFER_KEY)
                 .flatMap(size -> {
                     if (size == 0) return reactor.core.publisher.Mono.empty();
@@ -48,7 +52,9 @@ public class BatchDbWriterWorker {
                                     log.info("{} adet kayıt PostgreSQL'e toplu yazıldı.", batchList.size());
                                 }
                                 return null;
-                            }));
-                }).subscribe();
+                            }).subscribeOn(Schedulers.boundedElastic()));
+                })
+                .doFinally(signal -> flushing.set(false))
+                .subscribe(unused -> {}, error -> log.error("Redis DB aktarimi basarisiz", error));
     }
 }

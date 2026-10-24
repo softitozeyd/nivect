@@ -29,8 +29,7 @@ public class BottleInspectionServiceImpl implements BottleInspectionService {
 
     @Override
     public Mono<Void> processInspection(BottleInspectionDto dto) {
-        return Mono.fromRunnable(() -> {
-            try {
+        return Mono.fromCallable(() -> {
                 // 1. Kalite Kararı
                 boolean isPass = dto.isCapOk() && dto.isLabelOk() && dto.isLiquidLevelOk();
                 String result = isPass ? "PASS" : "FAIL";
@@ -52,13 +51,10 @@ public class BottleInspectionServiceImpl implements BottleInspectionService {
                 }
 
                 // 3. Redis In-Memory Kuyruğuna Ekleme (Non-blocking)
-                String json = objectMapper.writeValueAsString(entity);
-                redisTemplate.opsForList().rightPush(REDIS_BUFFER_KEY, json).subscribe();
-
-            } catch (Exception e) {
-                log.error("Inspection işleme hatası: ", e);
-            }
-        }).subscribeOn(Schedulers.boundedElastic()).then();
+                return objectMapper.writeValueAsString(entity);
+        }).flatMap(json -> redisTemplate.opsForList().rightPush(REDIS_BUFFER_KEY, json))
+                .doOnError(error -> log.error("Inspection isleme hatasi", error))
+                .then();
     }
 
     @Override
