@@ -1,0 +1,52 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: bottle-qc
+
+  # 1. PostgreSQL Veritabanı Bağlantı Ayarları
+  datasource:
+    url: jdbc:postgresql://localhost:5432/qc_db
+    username: qc_user
+    password: qc_password
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      idle-timeout: 300000
+      connection-timeout: 20000
+
+  # 2. JPA & Hibernate Performans ve Batch Ayarları
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update # Geliştirme ortamı için otomatik tablo oluşturma/güncelleme
+    show-sql: false # Yüksek hız için SQL loglarını kapalı tutuyoruz
+    properties:
+      hibernate:
+        format_sql: false
+        jdbc:
+          batch_size: 500 # Redis'ten gelen verileri DB'ye 500'erli toplu yazma
+          order_inserts: true
+          order_updates: true
+        generate_statistics: false
+
+  # 3. Redis In-Memory Buffer Bağlantı Ayarları
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 16
+          max-idle: 8
+          min-idle: 2
+
+# 4. MQTT Broker Bağlantı Ayarları (Kamera Akışı İçin Özel Parametreler)
+mqtt:
+  broker:
+    url: tcp://localhost:1883
+    client-id: spring-bottle-qc-backend
+    topic: production/+/inspections # Örn: production/line-1/inspections
