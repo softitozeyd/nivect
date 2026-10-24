@@ -28,7 +28,7 @@ Arkadasinizin uygulamasi IDE'den calisirken:
 
 | Ayar | Deger |
 |---|---|
-| JDBC URL | `jdbc:postgresql://localhost:15432/nivect` |
+| JDBC URL | `jdbc:postgresql://localhost:5432/nivect` |
 | DB kullanicisi | `nivect` |
 | DB parolasi | `.env` icindeki `POSTGRES_PASSWORD` |
 | Redis host / port | `localhost` / `6379` |
@@ -111,8 +111,15 @@ Uc servis Docker Desktop uzerinde healthy durumuna geldi.
 publish/subscribe testleri gecti. Bu sonuc Spring Boot/model entegrasyon testi
 veya veri kaybi dayaniklilik testi degildir.
 
-Host PostgreSQL portu 15432 secildi; bu bilgisayarda 5432 zaten baska bir
-servis tarafindan kullaniliyor. Container ici PostgreSQL portu 5432 kalir.
+Ilk baglanti testleri host 15432 portunda yapildi. Varsayilan host portu daha
+sonra ekip karariyla 5432 olarak guncellendi. Bu portta baska bir PostgreSQL
+servisi varsa Docker baslatilmadan once port cakismasi cozulmelidir.
+Bu degisiklik veritabani adi, kullanicisi ve parolasini degistirmez.
+
+5432 portuna gecis sonrasi uc servis tekrar healthy oldu; PostgreSQL SELECT 1,
+Redis PING ve MQTT publish/subscribe testleri yeniden gecti. Bilgisayardaki
+ayri Windows PostgreSQL 18 servisi kullanici onayiyla durduruldu; mevcut
+verileri silinmedi.
 
 ## Resmi kaynaklar
 
