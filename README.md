@@ -1,5 +1,10 @@
 # VisionQC PET: Ron 88 şişe kusur tespiti (v1)
 
+## Backend gelistirme altyapisi
+
+PostgreSQL, Redis ve Mosquitto yerel kurulumu icin [altyapi rehberi](docs/infrastructure.md).
+Spring Boot iskeleti bu paketten bagimsiz olarak gelistirilmektedir.
+
 Şeffaf PET su şişelerinde YOLO ile şişe ve kusur tespiti: `underfill` (düşük dolum), `missing_cap` (kapaksız), `loose_cap` (gevşek kapak).
 
 ## Dosyalar
