@@ -10,7 +10,7 @@ try {
     $mqttJson | docker compose exec -T mosquitto sh -ec 'mosquitto_pub -h localhost -u "$MQTT_USERNAME" -P "$MQTT_PASSWORD" -t production/dev-test/inspections -q 1 -s'
     if ($LASTEXITCODE -ne 0) { throw 'MQTT gonderimi basarisiz.' }
     $httpJson = @{ lineCode = $httpLine; capOk = $true; labelOk = $true; liquidLevelOk = $true } | ConvertTo-Json -Compress
-    $response = Invoke-WebRequest 'http://localhost:8080/api/v1/inspections' -Method Post -ContentType 'application/json' -Body $httpJson
+    $response = Invoke-WebRequest 'http://localhost:8080/api/v1/inspections' -UseBasicParsing -Method Post -ContentType 'application/json' -Body $httpJson
     if ($response.StatusCode -ne 202) { throw 'HTTP kabul testi basarisiz.' }
     $sql = "SELECT line_code || ':' || overall_result FROM bottle_inspections WHERE line_code IN ('$mqttLine', '$httpLine') ORDER BY line_code"
     $found = $false
