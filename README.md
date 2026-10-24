@@ -3,7 +3,16 @@
 ## Backend gelistirme altyapisi
 
 PostgreSQL, Redis ve Mosquitto yerel kurulumu icin [altyapi rehberi](docs/infrastructure.md).
-Spring Boot iskeleti bu paketten bagimsiz olarak gelistirilmektedir.
+Spring Boot backend'i altyapiyla birlikte baslatmak ve test etmek icin:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File ./scripts/setup-dev.ps1
+docker compose --profile app up -d --build --wait --wait-timeout 180
+powershell -ExecutionPolicy Bypass -File ./scripts/test-backend.ps1
+```
+
+Backend varsayilan olarak `http://localhost:8080` adresindedir. Parolalar yerel
+`.env` dosyasindan alinir ve Docker imajina dahil edilmez.
 
 Şeffaf PET su şişelerinde YOLO ile şişe ve kusur tespiti: `underfill` (düşük dolum), `missing_cap` (kapaksız), `loose_cap` (gevşek kapak).
 

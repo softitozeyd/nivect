@@ -2,14 +2,16 @@ server:
   port: 8080
 
 spring:
+  config:
+    import: optional:file:.env[.properties]
   application:
     name: bottle-qc
 
   # 1. PostgreSQL Veritabanı Bağlantı Ayarları
   datasource:
-    url: jdbc:postgresql://localhost:5432/qc_db
-    username: qc_user
-    password: qc_password
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:nivect}
+    username: ${POSTGRES_USER:nivect}
+    password: ${POSTGRES_PASSWORD}
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 20
@@ -35,8 +37,9 @@ spring:
   # 3. Redis In-Memory Buffer Bağlantı Ayarları
   data:
     redis:
-      host: localhost
-      port: 6379
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD}
       timeout: 2000ms
       lettuce:
         pool:
@@ -47,6 +50,17 @@ spring:
 # 4. MQTT Broker Bağlantı Ayarları (Kamera Akışı İçin Özel Parametreler)
 mqtt:
   broker:
-    url: tcp://localhost:1883
-    client-id: spring-bottle-qc-backend
-    topic: production/+/inspections # Örn: production/line-1/inspections
+    url: ${MQTT_URL:tcp://localhost:1883}
+    client-id: ${MQTT_CLIENT_ID:spring-bottle-qc-backend}
+    username: ${MQTT_USERNAME:nivect}
+    password: ${MQTT_PASSWORD}
+    topic: ${MQTT_TOPIC:production/+/inspections}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never
