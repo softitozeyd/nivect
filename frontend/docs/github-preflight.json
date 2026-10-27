@@ -1,0 +1,10 @@
+{
+  "tracked_files": 63,
+  "history_blobs_scanned": 79,
+  "commits": 3,
+  "findings": [],
+  "env_paths_in_history": [
+    ".env.example"
+  ],
+  "working_tree_env_files": []
+}

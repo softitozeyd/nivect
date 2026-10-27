@@ -1,0 +1,13 @@
+# Place this file at the nivect repository root and this project in frontend/.
+# docker compose -f compose.yaml -f compose.frontend.yaml --profile app up -d --build
+services:
+  frontend:
+    profiles: [app]
+    build:
+      context: ./frontend
+    ports:
+      - "127.0.0.1:5197:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped

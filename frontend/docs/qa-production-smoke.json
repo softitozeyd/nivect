@@ -1,0 +1,134 @@
+{
+  "status": "PASS",
+  "environment": "Chromium headless, Windows, local Vite preview, no throttling",
+  "baseURL": "http://127.0.0.1:5199",
+  "routeChecks": 12,
+  "operatorReview": "PASS",
+  "spaFallback": "PASS",
+  "consoleErrors": [],
+  "failedResponses": [],
+  "externalRequests": [],
+  "assets": [
+    {
+      "name": "index-DJ775a7v.js",
+      "bytes": 403888,
+      "gzipBytes": 122695
+    },
+    {
+      "name": "index-Dymkg77c.css",
+      "bytes": 50031,
+      "gzipBytes": 11031
+    }
+  ],
+  "measurements": [
+    {
+      "route": "/",
+      "width": 1440,
+      "headingVisibleMs": 492,
+      "fits": true,
+      "longTasks": [],
+      "domContentLoaded": 134.40000009536743,
+      "resourceBytes": 231910
+    },
+    {
+      "route": "/monitoring",
+      "width": 1440,
+      "headingVisibleMs": 168,
+      "fits": true,
+      "longTasks": [],
+      "domContentLoaded": 34.39999997615814,
+      "resourceBytes": 3000
+    },
+    {
+      "route": "/history",
+      "width": 1440,
+      "headingVisibleMs": 155,
+      "fits": true,
+      "longTasks": [],
+      "domContentLoaded": 43.699999928474426,
+      "resourceBytes": 3000
+    },
+    {
+      "route": "/stations",
+      "width": 1440,
+      "headingVisibleMs": 213,
+      "fits": true,
+      "longTasks": [],
+      "domContentLoaded": 81.89999997615814,
+      "resourceBytes": 3000
+    },
+    {
+      "route": "/reports",
+      "width": 1440,
+      "headingVisibleMs": 194,
+      "fits": true,
+      "longTasks": [],
+      "domContentLoaded": 31.399999976158142,
+      "resourceBytes": 3000
+    },
+    {
+      "route": "/settings",
+      "width": 1440,
+      "headingVisibleMs": 162,
+      "fits": true,
+      "longTasks": [],
+      "domContentLoaded": 62.10000002384186,
+      "resourceBytes": 3600
+    },
+    {
+      "route": "/",
+      "width": 390,
+      "headingVisibleMs": 152,
+      "fits": true,
+      "longTasks": [],
+      "domContentLoaded": 31,
+      "resourceBytes": 3600
+    },
+    {
+      "route": "/monitoring",
+      "width": 390,
+      "headingVisibleMs": 111,
+      "fits": true,
+      "longTasks": [],
+      "domContentLoaded": 29.100000023841858,
+      "resourceBytes": 3000
+    },
+    {
+      "route": "/history",
+      "width": 390,
+      "headingVisibleMs": 190,
+      "fits": true,
+      "longTasks": [],
+      "domContentLoaded": 54.700000047683716,
+      "resourceBytes": 3000
+    },
+    {
+      "route": "/stations",
+      "width": 390,
+      "headingVisibleMs": 113,
+      "fits": true,
+      "longTasks": [],
+      "domContentLoaded": 49,
+      "resourceBytes": 3000
+    },
+    {
+      "route": "/reports",
+      "width": 390,
+      "headingVisibleMs": 103,
+      "fits": true,
+      "longTasks": [],
+      "domContentLoaded": 25.799999952316284,
+      "resourceBytes": 3000
+    },
+    {
+      "route": "/settings",
+      "width": 390,
+      "headingVisibleMs": 194,
+      "fits": true,
+      "longTasks": [],
+      "domContentLoaded": 45.59999990463257,
+      "resourceBytes": 3600
+    }
+  ],
+  "limitations": "Single local sample. Not a load test, field Core Web Vitals audit, or Nginx/Docker validation."
+}
