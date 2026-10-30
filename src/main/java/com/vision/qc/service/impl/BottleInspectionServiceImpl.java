@@ -65,6 +65,13 @@ public class BottleInspectionServiceImpl implements BottleInspectionService {
     }
 
     @Override
+    public Flux<BottleInspection> getRecentInspections() {
+        return Mono.fromCallable(repository::findTop100ByOrderByInspectedAtDescIdDesc)
+                .flatMapMany(Flux::fromIterable)
+                .subscribeOn(Schedulers.boundedElastic());
+    }
+
+    @Override
     public Mono<List<BottleInspection>> saveBatch(List<BottleInspection> inspections) {
         return Mono.fromCallable(() -> repository.saveAll(inspections))
                 .subscribeOn(Schedulers.boundedElastic());

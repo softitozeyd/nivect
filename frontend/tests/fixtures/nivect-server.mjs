@@ -12,7 +12,7 @@ const server = http.createServer((req, res) => {
     res.end('{"status":"UP"}');
     return;
   }
-  if (req.url === "/api/v1/inspections/failures") {
+  if (req.url === "/api/v1/inspections/failures" || req.url === "/api/v1/inspections") {
     res.end(
       JSON.stringify([
         {

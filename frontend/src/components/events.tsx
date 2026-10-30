@@ -1,5 +1,5 @@
 import { useLanguage, useT } from '../i18n';
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ArrowRight,
   ChevronLeft,
@@ -10,7 +10,8 @@ import {
 import { categories, emptyFilters, filterEvents, formatDate } from "../domain";
 import type { InspectionEvent, Filters, OperatorReview } from "../domain";
 import { useApp } from "../store";
-import { Badge, EmptyState, InspectionFrame, Modal } from "./ui";
+import { adapter, ApiAdapter } from "../services/adapter";
+import { Badge, EmptyState, ErrorState, InspectionFrame, Modal } from "./ui";
 import { inspectionCsv } from "../utils/csv";
 export function EventTable({
   events,
@@ -440,11 +441,31 @@ export function EventDetail({
 export function History() {
   const t = useT();
   const { language } = useLanguage();
-  const { snapshot, failuresOnly } = useApp();
+  const { snapshot, failuresOnly, preferences } = useApp();
+  const [history, setHistory] = useState<InspectionEvent[] | null>(null);
+  const [historyError, setHistoryError] = useState("");
+  const [retry, setRetry] = useState(0);
+  useEffect(() => {
+    if (!(adapter instanceof ApiAdapter)) return;
+    const api = adapter;
+    const controller = new AbortController();
+    let timer: ReturnType<typeof setTimeout>;
+    async function load() {
+      try {
+        const events = await api.history(controller.signal);
+        if (!controller.signal.aborted) { setHistory(events); setHistoryError(""); }
+      } catch (error) {
+        if (!controller.signal.aborted) setHistoryError(error instanceof Error ? error.message : "Could not connect");
+      }
+      if (!controller.signal.aborted) timer = setTimeout(load, preferences.interval);
+    }
+    void load();
+    return () => { controller.abort(); clearTimeout(timer); };
+  }, [preferences.interval, retry]);
   const [filters, setFilters] = useState(emptyFilters);
   const [page, setPage] = useState(1);
   const [selected, setSelected] = useState<InspectionEvent | null>(null);
-  const rows = filterEvents(snapshot?.events || [], filters, t, language);
+  const rows = filterEvents(failuresOnly ? history || [] : snapshot?.events || [], filters, t, language);
   const pages = Math.max(1, Math.ceil(rows.length / 10));
   const safePage = Math.min(page, pages);
   return (
@@ -452,11 +473,13 @@ export function History() {
       <div className="section-top">
         <p className="muted">
           {failuresOnly
-            ? t("Nivect · Local filtering of the latest 20 failures")
+            ? t("Latest 100 saved inspections · Filters apply to these records")
             : t("Session history of up to 500 records")}{" "}
           · {rows.length}{' '}{t("results")}{' '}</p>
         <ExportButton events={rows} />
       </div>
+      {failuresOnly && historyError && <ErrorState message={historyError} retry={() => setRetry(value => value + 1)} />}
+      {failuresOnly && !history && !historyError && <p>{t("Loading inspection data…")}</p>}
       <section className="panel">
         <FilterPanel
           value={filters}

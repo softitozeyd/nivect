@@ -10,5 +10,6 @@ import java.util.List;
 public interface BottleInspectionService {
     Mono<Void> processInspection(BottleInspectionDto dto);
     Flux<BottleInspection> getRecentFailures();
+    Flux<BottleInspection> getRecentInspections();
     Mono<List<BottleInspection>> saveBatch(List<BottleInspection> inspections);
 }

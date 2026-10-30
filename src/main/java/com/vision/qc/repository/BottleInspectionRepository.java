@@ -14,6 +14,8 @@ public interface BottleInspectionRepository extends JpaRepository<BottleInspecti
     List<BottleInspection> findByLineCodeAndInspectedAtBetween(
             String lineCode, LocalDateTime start, LocalDateTime end);
 
+    List<BottleInspection> findTop100ByOrderByInspectedAtDescIdDesc();
+
     // Son hatalı (FAIL) ürünleri getirme
     List<BottleInspection> findTop20ByOverallResultOrderByInspectedAtDesc(String overallResult);
 }

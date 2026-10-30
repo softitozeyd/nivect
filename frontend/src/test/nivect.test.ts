@@ -2,6 +2,7 @@ import { beforeEach, afterEach, it, expect, vi } from "vitest";
 import {
   ApiAdapter,
   failuresSchema,
+  historySchema,
   toInspectionEvent,
   normalizeInspectedAt,
 } from "../services/nivect";
@@ -172,4 +173,13 @@ it("honors cancellation and rejects invalid operator writes without any POST", a
     }),
   ).rejects.toThrow("no API");
   expect(fetchMock).not.toHaveBeenCalled();
+});
+
+it("history accepts both results, rejects inconsistent rows and maps passes", async () => {
+  const pass = { ...sample, id: 13, capOk: true, overallResult: "PASS" as const };
+  expect(historySchema.safeParse([sample, pass]).success).toBe(true);
+  expect(historySchema.safeParse([{...pass, capOk: false}]).success).toBe(false);
+  expect(toInspectionEvent(pass)).toMatchObject({decision: "pass", category: "Pass", defects: []});
+  vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(JSON.stringify([sample, pass]))));
+  expect((await new ApiAdapter().history()).map(row => row.decision)).toEqual(["reject", "pass"]);
 });

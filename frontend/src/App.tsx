@@ -185,7 +185,7 @@ export default function App() {
                 {mode === "api" && location.pathname === "/monitoring"
                   ? t("View the latest available failure record.")
                   : mode === "api" && location.pathname === "/history"
-                    ? t("Find and inspect recent failure records.")
+                    ? t("Find and inspect recent inspection records.")
                     : t(descriptions[location.pathname] || "")}
               </p>
             </div>
@@ -234,8 +234,8 @@ export default function App() {
             <div className="notice api-scope-banner">
               <Activity size={16} />
               <div>
-                <strong>{t("Nivect / Spring Boot · Latest 20 failures")}</strong>
-                <p>{t("This API provides FAIL records only. Total production, overall defect rate, FPS, camera health, model confidence, and image access are unavailable. No failure records does not mean production has stopped. Assumed backend UTC offset:")}{" "}
+                <strong>{t(location.pathname === "/history" ? "Nivect / Spring Boot · Latest 100 inspections" : "Nivect / Spring Boot · Latest 20 failures")}</strong>
+                <p>{t(location.pathname === "/history" ? "History shows the latest 100 saved records. Total production, FPS, camera health, model confidence and image access are unavailable. Assumed backend UTC offset:" : "This API provides FAIL records only. Total production, overall defect rate, FPS, camera health, model confidence, and image access are unavailable. No failure records does not mean production has stopped. Assumed backend UTC offset:")}{" "}
                   {backendOffset}{' '}{t("(the API provides no time zone).")}{' '}</p>
               </div>
             </div>

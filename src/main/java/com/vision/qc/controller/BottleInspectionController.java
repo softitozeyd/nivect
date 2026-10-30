@@ -23,6 +23,12 @@ public class BottleInspectionController {
         return inspectionService.processInspection(dto);
     }
 
+    // Dashboard history: bounded to the 100 most recent saved records.
+    @GetMapping
+    public Flux<BottleInspection> getRecentInspections() {
+        return inspectionService.getRecentInspections();
+    }
+
     // Dashboard için son hatalı ürünleri getiren endpoint
     @GetMapping("/failures")
     public Flux<BottleInspection> getRecentFailures() {

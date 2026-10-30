@@ -9,6 +9,7 @@ import type { InspectionAdapter } from "./adapter";
 
 // Confirmed against softitozeyd/nivect @ 31c9ce15d179b1f6664b5e4b61de45da4ebd5f00.
 export const FAILURE_PATH = "/api/v1/inspections/failures";
+export const HISTORY_PATH = "/api/v1/inspections";
 export const HEALTH_PATH = "/actuator/health";
 export const petProduct = "Ron 88 · PET water bottle";
 export const backendOffset =
@@ -45,6 +46,17 @@ export const failuresSchema = z
     "Duplicate inspection ID",
   );
 export type NivectFailure = z.infer<typeof failureSchema>;
+export const inspectionSchema = z.object({
+  id: z.number().int().positive().max(Number.MAX_SAFE_INTEGER),
+  lineCode: z.string().trim().min(1).max(50),
+  capOk: z.boolean(), labelOk: z.boolean(), liquidLevelOk: z.boolean(),
+  overallResult: z.enum(["PASS", "FAIL"]), imagePath: z.string().nullish(),
+  inspectedAt: localTimestamp,
+}).refine(row => (row.capOk && row.labelOk && row.liquidLevelOk) === (row.overallResult === "PASS"), "Inconsistent inspection result");
+export const historySchema = z.array(inspectionSchema).max(100)
+  .refine(rows => new Set(rows.map(row => row.id)).size === rows.length, "Duplicate inspection ID");
+export type NivectInspection = z.infer<typeof inspectionSchema>;
+
 export function normalizeInspectedAt(
   value: string,
   offset = backendOffset,
@@ -60,7 +72,7 @@ export function normalizeInspectedAt(
   return new Date(`${milliseconds}${offset}`).toISOString();
 }
 export function toInspectionEvent(
-  row: NivectFailure,
+  row: NivectInspection,
   offset = backendOffset,
 ): InspectionEvent {
   const defects: DefectCategory[] = [];
@@ -75,14 +87,14 @@ export function toInspectionEvent(
     lineId: row.lineCode,
     stationId: "Unavailable",
     product: petProduct,
-    category: defects.length > 1 ? "Multiple defects" : defects[0],
+    category: defects.length > 1 ? "Multiple defects" : defects[0] || "Pass",
     defects,
     checks: {
       capOk: row.capOk,
       labelOk: row.labelOk,
       liquidLevelOk: row.liquidLevelOk,
     },
-    decision: "reject",
+    decision: row.overallResult === "PASS" ? "pass" : "reject",
     confidence: null,
     modelVersion: "Unavailable",
     imageUrl: null,
@@ -169,6 +181,11 @@ export class ApiAdapter implements InspectionAdapter {
       coverage: "failures-only",
       backendHealth,
     };
+  }
+  async history(signal?: AbortSignal): Promise<InspectionEvent[]> {
+    const parsed = historySchema.safeParse(await this.request(HISTORY_PATH, {}, signal));
+    if (!parsed.success) throw new Error("Inspection history does not match the expected data contract.");
+    return parsed.data.map(row => toInspectionEvent(row, this.offset));
   }
   async review(_id: string, _review: OperatorReview): Promise<void> {
     void _id;

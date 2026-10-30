@@ -3,6 +3,11 @@ import type { ReactNode } from "react";
 
 export type Language = "tr" | "en";
 const turkish: Record<string, string> = {
+  "Nivect / Spring Boot · Latest 100 inspections": "Nivect / Spring Boot · Son 100 inceleme",
+  "History shows the latest 100 saved records. Total production, FPS, camera health, model confidence and image access are unavailable. Assumed backend UTC offset:": "Geçmişte kaydedilmiş son 100 inceleme gösterilir. Toplam üretim, FPS, kamera durumu, model güveni ve görüntüler sunulmuyor. Uygulanan sunucu saat farkı:",
+  "Find and inspect recent inspection records.": "Son inceleme kayıtlarını bulun ve inceleyin.",
+  "Latest 100 saved inspections · Filters apply to these records": "Kaydedilmiş son 100 inceleme · Filtreler bu kayıtlara uygulanır",
+  "Inspection history does not match the expected data contract.": "İnceleme geçmişi beklenen veri biçimine uymuyor.",
   "Interface language": "Arayüz dili", "Inspection details": "İnceleme ayrıntıları", "open details": "ayrıntıları aç", "{count} records exported as CSV.": "{count} kayıt CSV olarak indirildi.",
   "Latest failure records: {count}. Operator reviews are unavailable.": "Son hatalı kayıt sayısı: {count}. Operatör değerlendirmesi henüz sunulmuyor.",
   "There are {count} unreviewed AI defect predictions in this session. Review them in Inspection History.": "Bu oturumda değerlendirme bekleyen {count} tahmin var. İnceleme Geçmişi'nden değerlendirin.",
