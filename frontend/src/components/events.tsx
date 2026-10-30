@@ -1,3 +1,4 @@
+import { useLanguage, useT } from '../i18n';
 import { useState } from "react";
 import {
   ArrowRight,
@@ -20,6 +21,8 @@ export function EventTable({
   onSelect: (event: InspectionEvent) => void;
   recommendations?: boolean;
 }) {
+  const t = useT();
+  const { language } = useLanguage();
   const { preferences } = useApp();
   return (
     <div
@@ -28,16 +31,16 @@ export function EventTable({
       <table>
         <thead>
           <tr>
-            <th>EVENT / TIME</th>
-            <th>STATION</th>
-            <th>RESULT</th>
-            <th>FINDING</th>
-            <th>CONFIDENCE</th>
+            <th>{t("EVENT / TIME")}</th>
+            <th>{t("STATION")}</th>
+            <th>{t("RESULT")}</th>
+            <th>{t("FINDING")}</th>
+            <th>{t("CONFIDENCE")}</th>
             <th>
               {recommendations ? (
-                "ACTION"
+                t("ACTION")
               ) : (
-                <span className="sr-only">Open</span>
+                <span className="sr-only">{t("Open")}</span>
               )}
             </th>
           </tr>
@@ -84,7 +87,7 @@ export function EventTable({
                     >
                       {e.id}
                     </button>
-                    <small>{formatDate(e.timestamp, preferences.zone)}</small>
+                    <small>{formatDate(e.timestamp, preferences.zone, language === "tr" ? "tr-TR" : "en-US")}</small>
                     {recommendations && (
                       <small className="product-caption">{e.product}</small>
                     )}
@@ -92,28 +95,28 @@ export function EventTable({
                 </div>
               </td>
               <td>
-                {e.stationId}
+                {t(e.stationId)}
                 <small>
-                  {e.lineId === "L1" ? "Production Line 01" : e.lineId}
+                  {e.lineId === "L1" ? t("Production Line 01") : e.lineId}
                 </small>
               </td>
               <td>
                 <Badge tone={e.decision === "pass" ? "success" : "danger"}>
-                  {e.decision === "pass" ? "Pass" : "Fail"}
+                  {e.decision === "pass" ? t("Pass") : t("Fail")}
                 </Badge>
               </td>
               <td>
-                {e.category}
+                {t(e.category)}
                 {e.defects && e.defects.length > 1 && (
-                  <small>{e.defects.join(" · ")}</small>
+                  <small>{e.defects.map(t).join(" · ")}</small>
                 )}
                 {e.review && (
                   <small className="teal">
                     {e.review.outcome === "confirmed"
-                      ? "Operator confirmed"
+                      ? t("Operator confirmed")
                       : e.review.outcome === "false-positive"
-                        ? "False positive"
-                        : "Flagged for review"}
+                        ? t("False positive")
+                        : t("Flagged for review")}
                   </small>
                 )}
               </td>
@@ -136,16 +139,16 @@ export function EventTable({
                       ? `recommendation-action ${e.decision === "reject" ? "review" : "pass"}`
                       : "icon-button"
                   }
-                  aria-label={`${e.id} open details`}
+                  aria-label={`${e.id} ${t("open details")}`}
                   onClick={() => onSelect(e)}
                 >
                   {recommendations ? (
                     <>
                       {e.review
-                        ? "Reviewed"
+                        ? t("Reviewed")
                         : e.decision === "reject"
-                          ? "Review"
-                          : "Details"}
+                          ? t("Review")
+                          : t("Details")}
                       <ArrowRight size={12} />
                     </>
                   ) : (
@@ -170,6 +173,7 @@ export function FilterPanel({
   onChange: (f: Filters) => void;
   stations?: string[];
 }) {
+  const t = useT();
   const update = (key: keyof Filters, v: string) =>
     onChange({ ...value, [key]: v });
   return (
@@ -177,77 +181,65 @@ export function FilterPanel({
       <label className="search">
         <Search size={17} />
         <input
-          aria-label="Search events or products"
-          placeholder="Search events or products…"
+          aria-label={t("Search events or products")}
+          placeholder={t("Search events or products…")}
           value={value.search}
           onChange={(e) => update("search", e.target.value)}
         />
       </label>
-      <label>
-        Defect type
-        <select
-          aria-label="Defect type"
+      <label>{t("Defect type")}{' '}<select
+          aria-label={t("Defect type")}
           value={value.category}
           onChange={(e) => update("category", e.target.value)}
         >
-          <option value="all">All findings</option>
+          <option value="all">{t("All findings")}</option>
           {categories.map((c) => (
-            <option key={c}>{c}</option>
+            <option key={c} value={c}>{t(c)}</option>
           ))}
         </select>
       </label>
-      <label>
-        Station
-        <select
-          aria-label="Station"
+      <label>{t("Station")}{' '}<select
+          aria-label={t("Station")}
           disabled={!stations.length}
           value={value.station}
           onChange={(e) => update("station", e.target.value)}
         >
           <option value="all">
-            {stations.length ? "All stations" : "Unavailable from API"}
+            {stations.length ? t("All stations") : t("Unavailable from API")}
           </option>
           {stations.map((id) => (
             <option key={id}>{id}</option>
           ))}
         </select>
       </label>
-      <label>
-        Decision
-        <select
-          aria-label="Decision"
+      <label>{t("Decision")}{' '}<select
+          aria-label={t("Decision")}
           value={value.decision}
           onChange={(e) => update("decision", e.target.value)}
         >
-          <option value="all">All decisions</option>
-          <option value="reject">Fail</option>
-          <option value="pass">Pass</option>
+          <option value="all">{t("All decisions")}</option>
+          <option value="reject">{t("Fail")}</option>
+          <option value="pass">{t("Pass")}</option>
         </select>
       </label>
-      <label>
-        Start date
-        <input
+      <label>{t("Start date")}{' '}<input
           type="date"
-          aria-label="Start date"
+          aria-label={t("Start date")}
           max={value.to || undefined}
           value={value.from}
           onChange={(e) => update("from", e.target.value)}
         />
       </label>
-      <label>
-        End date
-        <input
+      <label>{t("End date")}{' '}<input
           type="date"
-          aria-label="End date"
+          aria-label={t("End date")}
           min={value.from}
           value={value.to}
           onChange={(e) => update("to", e.target.value)}
         />
       </label>
-      <label>
-        Sort order
-        <select
-          aria-label="Sort order"
+      <label>{t("Sort order")}{' '}<select
+          aria-label={t("Sort order")}
           value={value.sort}
           onChange={(e) =>
             onChange({
@@ -256,16 +248,12 @@ export function FilterPanel({
             })
           }
         >
-          <option value="newest">Newest first</option>
-          <option value="oldest">Oldest first</option>
+          <option value="newest">{t("Newest first")}</option>
+          <option value="oldest">{t("Oldest first")}</option>
         </select>
       </label>
-      <button className="subtle" onClick={() => onChange(emptyFilters)}>
-        Clear
-      </button>
-      <small className="filter-timezone">
-        Date boundaries: Istanbul (UTC+3)
-      </small>
+      <button className="subtle" onClick={() => onChange(emptyFilters)}>{t("Clear")}{' '}</button>
+      <small className="filter-timezone">{t("Date boundaries: Istanbul (UTC+3)")}{' '}</small>
     </div>
   );
 }
@@ -281,17 +269,17 @@ export function exportCsv(events: InspectionEvent[], simulated = true) {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 export function ExportButton({ events }: { events: InspectionEvent[] }) {
+  const t = useT();
   const { mode, preferences, setToast } = useApp();
   return (
     <button
       onClick={() => {
         exportCsv(events, mode === "demo");
         if (preferences.notifications)
-          setToast(`${events.length} records exported as CSV.`);
+          setToast(t("{count} records exported as CSV.").replace("{count}", String(events.length)));
       }}
     >
-      <Download size={16} /> Download CSV
-    </button>
+      <Download size={16} />{' '}{t("Download CSV")}{' '}</button>
   );
 }
 export function EventDetail({
@@ -301,6 +289,8 @@ export function EventDetail({
   event: InspectionEvent;
   onClose: () => void;
 }) {
+  const t = useT();
+  const { language } = useLanguage();
   const { review, mode, offline, error, preferences } = useApp();
   const [outcome, setOutcome] = useState<OperatorReview["outcome"]>(
     event.review?.outcome || "confirmed",
@@ -327,11 +317,11 @@ export function EventDetail({
     }
   }
   return (
-    <Modal title={`Inspection details · ${event.id}`} onClose={onClose}>
+    <Modal title={`${t("Inspection details")} · ${event.id}`} onClose={onClose}>
       <InspectionFrame event={event} simulated={mode === "demo"} />
       <div className="detail-grid">
         {[
-          ["Time", formatDate(event.timestamp, preferences.zone)],
+          ["Time", formatDate(event.timestamp, preferences.zone, language === "tr" ? "tr-TR" : "en-US")],
           ...(event.sourceInspectedAt
             ? [
                 ["Server time (no time zone)", event.sourceInspectedAt],
@@ -345,7 +335,7 @@ export function EventDetail({
           ["Line / Station", `${event.lineId} / ${event.stationId}`],
           [
             mode === "demo" ? "AI prediction" : "Backend quality decision",
-            `${event.category} · ${event.confidence === null ? "—" : `${(event.confidence * 100).toFixed(1)}%`}`,
+            `${t(event.category)} · ${event.confidence === null ? "—" : `${(event.confidence * 100).toFixed(1)}%`}`,
           ],
           ["Model version", event.modelVersion],
           ...(event.checks
@@ -375,34 +365,26 @@ export function EventDetail({
           ],
         ].map(([key, value]) => (
           <div key={key}>
-            <small>{key}</small>
-            <strong>{value}</strong>
+            <small>{t(key)}</small>
+            <strong>{["Operator decision", "Cap check", "Label check", "Fill level check", "Model version"].includes(key) ? t(value) : value}</strong>
           </div>
         ))}
       </div>
       {event.defects && (
-        <p className="notice">
-          All defects: {event.defects.join(" · ")}. The backend does not
-          distinguish missing caps from loose caps.
-        </p>
+        <p className="notice">{t("All defects:")}{' '}{event.defects.map(t).join(" · ")}{t(". The backend does not distinguish missing caps from loose caps.")}{' '}</p>
       )}
       {event.imagePath && (
-        <p className="muted">
-          The server file path is not an image download URL. It is not opened
-          automatically because the backend provides no image access endpoint.
-        </p>
+        <p className="muted">{t("The server file path is not an image download URL. It is not opened automatically because the backend provides no image access endpoint.")}{' '}</p>
       )}
-      {saved?.note && <p className="notice">Operator note: {saved.note}</p>}
-      <h3>Operator review</h3>
+      {saved?.note && <p className="notice">{t("Operator note:")}{' '}{saved.note}</p>}
+      <h3>{t("Operator review")}</h3>
       <p className="muted">
         {mode === "api"
-          ? "Operator reviews are unavailable for live records."
-          : "The AI prediction stays unchanged. Demo reviews are stored only for this session."}
+          ? t("Operator reviews are unavailable for live records.")
+          : t("The AI prediction stays unchanged. Demo reviews are stored only for this session.")}
       </p>
-      <label>
-        Review outcome
-        <select
-          aria-label="Review outcome"
+      <label>{t("Review outcome")}{' '}<select
+          aria-label={t("Review outcome")}
           disabled={unavailable || busy || confirm}
           value={outcome}
           onChange={(e) => {
@@ -411,27 +393,22 @@ export function EventDetail({
               setOutcome(v);
           }}
         >
-          <option value="confirmed">Confirm defect</option>
-          <option value="false-positive">Mark as false positive</option>
-          <option value="flagged">Flag for review</option>
+          <option value="confirmed">{t("Confirm defect")}</option>
+          <option value="false-positive">{t("Mark as false positive")}</option>
+          <option value="flagged">{t("Flag for review")}</option>
         </select>
       </label>
-      <label>
-        Operator note
-        <textarea
+      <label>{t("Operator note")}{' '}<textarea
           maxLength={500}
           disabled={unavailable || busy || confirm}
           rows={3}
           value={note}
           onChange={(e) => setNote(e.target.value)}
-          placeholder="Add your review…"
+          placeholder={t("Add your review…")}
         />
       </label>
       {mode === "api" && (
-        <p className="notice">
-          Live record changes are disabled until an approved API and
-          authorization are available.
-        </p>
+        <p className="notice">{t("Live record changes are disabled until an approved API and authorization are available.")}{' '}</p>
       )}
       {failure && (
         <p role="alert" className="danger">
@@ -440,17 +417,14 @@ export function EventDetail({
       )}
       {confirm ? (
         <div className="notice">
-          <p>
-            Your review will be added to this demo quality record. Do you want
-            to continue?
-          </p>
-          <button onClick={() => setConfirm(false)}>Cancel</button>
+          <p>{t("Your review will be added to this demo quality record. Do you want to continue?")}{' '}</p>
+          <button onClick={() => setConfirm(false)}>{t("Cancel")}</button>
           <button
             className="primary"
             disabled={busy || unavailable}
             onClick={() => void save()}
           >
-            {busy ? "Saving…" : "Confirm and save"}
+            {busy ? t("Saving…") : t("Confirm and save")}
           </button>
         </div>
       ) : (
@@ -458,19 +432,19 @@ export function EventDetail({
           className="primary full"
           disabled={unavailable}
           onClick={() => setConfirm(true)}
-        >
-          Save review
-        </button>
+        >{t("Save review")}{' '}</button>
       )}
     </Modal>
   );
 }
 export function History() {
+  const t = useT();
+  const { language } = useLanguage();
   const { snapshot, failuresOnly } = useApp();
   const [filters, setFilters] = useState(emptyFilters);
   const [page, setPage] = useState(1);
   const [selected, setSelected] = useState<InspectionEvent | null>(null);
-  const rows = filterEvents(snapshot?.events || [], filters);
+  const rows = filterEvents(snapshot?.events || [], filters, t, language);
   const pages = Math.max(1, Math.ceil(rows.length / 10));
   const safePage = Math.min(page, pages);
   return (
@@ -478,10 +452,9 @@ export function History() {
       <div className="section-top">
         <p className="muted">
           {failuresOnly
-            ? "Nivect · Local filtering of the latest 20 failures"
-            : "Session history of up to 500 records"}{" "}
-          · {rows.length} results
-        </p>
+            ? t("Nivect · Local filtering of the latest 20 failures")
+            : t("Session history of up to 500 records")}{" "}
+          · {rows.length}{' '}{t("results")}{' '}</p>
         <ExportButton events={rows} />
       </div>
       <section className="panel">
@@ -508,12 +481,12 @@ export function History() {
         />
         <div className="pagination">
           <span>
-            {rows.length} records · {rows.length ? (safePage - 1) * 10 + 1 : 0}–
+            {rows.length}{' '}{t("records ·")}{' '}{rows.length ? (safePage - 1) * 10 + 1 : 0}–
             {Math.min(safePage * 10, rows.length)}
           </span>
           <div>
             <button
-              aria-label="Previous page"
+              aria-label={t("Previous page")}
               disabled={safePage === 1}
               onClick={() => setPage(safePage - 1)}
             >
@@ -523,7 +496,7 @@ export function History() {
               {safePage} / {pages}
             </span>
             <button
-              aria-label="Next page"
+              aria-label={t("Next page")}
               disabled={safePage === pages}
               onClick={() => setPage(safePage + 1)}
             >

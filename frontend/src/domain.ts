@@ -124,7 +124,7 @@ export function metrics(events: InspectionEvent[], fps = 0): DashboardMetrics {
   const defective = events.filter((e) => e.decision === "reject").length;
   return { total, defective, rate: total ? (defective / total) * 100 : 0, fps };
 }
-export function filterEvents(events: InspectionEvent[], f: Filters) {
+export function filterEvents(events: InspectionEvent[], f: Filters, translate: (value: string) => string = (value) => value, language = "en") {
   const from = f.from ? Date.parse(`${f.from}T00:00:00+03:00`) : -Infinity;
   const to = f.to ? Date.parse(`${f.to}T23:59:59.999+03:00`) : Infinity;
   if (Number.isNaN(from) || Number.isNaN(to) || from > to) return [];
@@ -132,9 +132,9 @@ export function filterEvents(events: InspectionEvent[], f: Filters) {
     .filter(
       (e) =>
         (!f.search ||
-          `${e.id} ${e.product} ${e.lineId} ${e.stationId} ${e.category} ${e.defects?.join(" ") || ""}`
-            .toLocaleLowerCase("en")
-            .includes(f.search.toLocaleLowerCase("en"))) &&
+          `${e.id} ${e.product} ${e.lineId} ${e.stationId} ${e.category} ${translate(e.category)} ${e.defects?.join(" ") || ""} ${e.defects?.map(translate).join(" ") || ""}`
+            .toLocaleLowerCase(language)
+            .includes(f.search.toLocaleLowerCase(language))) &&
         (f.category === "all" ||
           e.category === f.category ||
           e.defects?.some((defect) => defect === f.category)) &&
@@ -149,11 +149,11 @@ export function filterEvents(events: InspectionEvent[], f: Filters) {
         : Date.parse(a.timestamp) - Date.parse(b.timestamp),
     );
 }
-export function formatDate(value: string, zone = "Europe/Istanbul") {
+export function formatDate(value: string, zone = "Europe/Istanbul", locale = "en-US") {
   const d = new Date(value);
   return Number.isNaN(d.valueOf())
     ? "Unknown"
-    : new Intl.DateTimeFormat("en-US", {
+    : new Intl.DateTimeFormat(locale, {
         timeZone: zone,
         dateStyle: "short",
         timeStyle: "medium",

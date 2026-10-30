@@ -1,3 +1,4 @@
+import { useLanguage, useT } from '../i18n';
 import { useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import {
@@ -34,6 +35,8 @@ import {
 import { EventTable, EventDetail, ExportButton } from "../components/events";
 import { petProduct } from "../services/nivect";
 function MetricRow({ events }: { events: InspectionEvent[] }) {
+  const t = useT();
+  const { language } = useLanguage();
   const { snapshot, offline, error, mode, now, failuresOnly } = useApp();
   const m = metrics(
     events,
@@ -47,54 +50,56 @@ function MetricRow({ events }: { events: InspectionEvent[] }) {
   return (
     <div className="metric-grid">
       <MetricCard
-        label="INSPECTED PRODUCTS"
-        value={failuresOnly ? "—" : m.total.toLocaleString("en-US")}
-        unit="units"
+        label={t("INSPECTED PRODUCTS")}
+        value={failuresOnly ? "—" : m.total.toLocaleString(language === "tr" ? "tr-TR" : "en-US")}
+        unit={t("units")}
         detail={
           failuresOnly
-            ? "Total production is unavailable from API"
+            ? t("Total production is unavailable from API")
             : mode === "demo"
-              ? "Simulated records"
-              : "Received session records"
+              ? t("Simulated records")
+              : t("Received session records")
         }
       />
       <MetricCard
-        label={failuresOnly ? "FAILURE RECORDS RECEIVED" : "DEFECTIVE PRODUCTS"}
+        label={failuresOnly ? t("FAILURE RECORDS RECEIVED") : t("DEFECTIVE PRODUCTS")}
         value={String(m.defective)}
-        unit="units"
+        unit={t("units")}
         detail={
-          failuresOnly ? "Within the latest 20 FAIL records" : "Flagged by AI"
+          failuresOnly ? t("Within the latest 20 FAIL records") : t("Flagged by AI")
         }
         negative
       />
       <MetricCard
-        label="DEFECT RATE"
+        label={t("DEFECT RATE")}
         value={failuresOnly ? "—" : `${m.rate.toFixed(1)}%`}
         detail={
           failuresOnly
-            ? "PASS records are unavailable"
-            : "Defective / inspected products"
+            ? t("PASS records are unavailable")
+            : t("Defective / inspected products")
         }
         negative
       />
       <MetricCard
-        label="TOTAL PROCESSING SPEED"
+        label={t("TOTAL PROCESSING SPEED")}
         value={failuresOnly || offline || error ? "—" : String(m.fps)}
-        unit="FPS"
+        unit={t("FPS")}
         detail={
           failuresOnly
-            ? "FPS is unavailable from API"
+            ? t("FPS is unavailable from API")
             : offline || error
-              ? "Disconnected · Value is out of date"
+              ? t("Disconnected · Value is out of date")
               : mode === "demo"
-                ? "Total across 2 simulated stations"
-                : "Total across active stations"
+                ? t("Total across 2 simulated stations")
+                : t("Total across active stations")
         }
       />
     </div>
   );
 }
 export function Overview() {
+  const t = useT();
+  const { language } = useLanguage();
   const { snapshot, offline, error, mode, preferences, now, failuresOnly } =
     useApp();
   const [selected, setSelected] = useState<InspectionEvent | null>(null);
@@ -148,8 +153,8 @@ export function Overview() {
           <span className={healthy ? "pulse-dot" : "warning-dot"} />
           <strong>
             {failuresOnly
-              ? "Nivect · Latest failure records"
-              : "Production Line 01"}
+              ? t("Nivect · Latest failure records")
+              : t("Production Line 01")}
           </strong>
           <span className="divider" />
           {petProduct}
@@ -160,14 +165,14 @@ export function Overview() {
           }
         >
           {offline || error
-            ? "Connection lost"
+            ? t("Connection lost")
             : failuresOnly
-              ? "Camera health unavailable"
+              ? t("Camera health unavailable")
               : !healthy
-                ? "Check stations"
+                ? t("Check stations")
                 : mode === "demo"
-                  ? "Simulation active"
-                  : "Monitoring active"}
+                  ? t("Simulation active")
+                  : t("Monitoring active")}
         </Badge>
       </div>
       <MetricRow events={events} />
@@ -177,19 +182,19 @@ export function Overview() {
             <div className="panel-heading">
               <div>
                 <h2>
-                  {failuresOnly ? "Inspection center" : "AI inspection center"}{" "}
+                  {failuresOnly ? t("Inspection center") : t("AI inspection center")}{" "}
                   <span className="count">{summary.total}</span>
                 </h2>
                 <p>
                   {failuresOnly
-                    ? "Spring Boot quality decisions · latest 20 FAIL records"
-                    : "Latest inspections · AI decisions and operator review queue"}
+                    ? t("Spring Boot quality decisions · latest 20 FAIL records")
+                    : t("Latest inspections · AI decisions and operator review queue")}
                 </p>
               </div>
               <div
                 className="segmented-control"
                 role="group"
-                aria-label="Inspection queue filter"
+                aria-label={t("Inspection queue filter")}
               >
                 {(
                   [
@@ -198,17 +203,17 @@ export function Overview() {
                     { value: "reject", label: "Fail" },
                     { value: "pass", label: "Pass" },
                   ] as const
-                ).map((t) => (
+                ).map((option) => (
                   <button
-                    key={t.value}
+                    key={option.value}
                     disabled={
                       failuresOnly &&
-                      (t.value === "pass" || t.value === "pending")
+                      (option.value === "pass" || option.value === "pending")
                     }
-                    aria-pressed={queue === t.value}
-                    onClick={() => setQueue(t.value)}
+                    aria-pressed={queue === option.value}
+                    onClick={() => setQueue(option.value)}
                   >
-                    {t.label}
+                    {t(option.label)}
                   </button>
                 ))}
               </div>
@@ -217,26 +222,25 @@ export function Overview() {
             <div className="queue-footer">
               <span>
                 {failuresOnly
-                  ? "Open an event to view the available details."
-                  : "Open an event to view its image and review."}
+                  ? t("Open an event to view the available details.")
+                  : t("Open an event to view its image and review.")}
               </span>
-              <Link className="text-link" to="/history">
-                View all records <ArrowUpRight size={14} />
+              <Link className="text-link" to="/history">{t("View all records")}{' '}<ArrowUpRight size={14} />
               </Link>
             </div>
           </section>
           <section className="panel quality-panel">
             <div className="panel-heading">
               <div>
-                <h2>Inspection summary</h2>
+                <h2>{t("Inspection summary")}</h2>
                 <p>
                   {failuresOnly
-                    ? "Only FAIL records are available"
-                    : "AI decision distribution in this session"}
+                    ? t("Only FAIL records are available")
+                    : t("AI decision distribution in this session")}
                 </p>
               </div>
               <span className="soft-label">
-                {mode === "demo" ? "Demo" : "API"}
+                {mode === "demo" ? t("Demo") : t("API")}
               </span>
             </div>
             <div className="quality-ring-wrap">
@@ -248,41 +252,37 @@ export function Overview() {
                 role="img"
                 aria-label={
                   failuresOnly
-                    ? "Pass rate: total production and PASS records are unavailable from API"
+                    ? t("Pass rate: total production and PASS records are unavailable from API")
                     : `Pass rate based on AI predictions, percent ${passRate.toFixed(1)}`
                 }
               >
                 <div>
-                  <small>PASS RATE</small>
+                  <small>{t("PASS RATE")}</small>
                   <strong>
                     {failuresOnly ? "—" : `${passRate.toFixed(1)}%`}
                   </strong>
                   <span>
-                    {failuresOnly ? "Total unavailable" : "AI prediction"}
+                    {failuresOnly ? t("Total unavailable") : t("AI prediction")}
                   </span>
                 </div>
               </div>
               <span className="ring-chip good">
                 {failuresOnly
-                  ? "PASS unknown"
+                  ? t("PASS unknown")
                   : `${summary.total - summary.defective} passed`}
               </span>
-              <span className="ring-chip bad">{summary.defective} failed</span>
+              <span className="ring-chip bad">{summary.defective}{' '}{t("failed")}</span>
             </div>
             <div className="quality-bottom">
               <span>
-                <i className="legend-dot" />
-                Predicted pass
-              </span>
+                <i className="legend-dot" />{t("Predicted pass")}{' '}</span>
               <span>
-                <i className="legend-dot red" />
-                Predicted defect
-              </span>
+                <i className="legend-dot red" />{t("Predicted defect")}{' '}</span>
             </div>
             <p className="card-footnote">
               {failuresOnly
-                ? "Production defect rate and model accuracy cannot be calculated from the latest 20 failures."
-                : "This is not a model accuracy measurement; labeled ground truth is required."}
+                ? t("Production defect rate and model accuracy cannot be calculated from the latest 20 failures.")
+                : t("This is not a model accuracy measurement; labeled ground truth is required.")}
             </p>
           </section>
           <section className="panel activity-panel">
@@ -290,13 +290,13 @@ export function Overview() {
               <div>
                 <h2>
                   {failuresOnly
-                    ? "Failure record activity"
-                    : "Inspection activity"}
+                    ? t("Failure record activity")
+                    : t("Inspection activity")}
                 </h2>
                 <p>
                   {failuresOnly
-                    ? "Received FAIL records over the last 3 hours"
-                    : "Last 3 hours · 15-minute production intervals"}
+                    ? t("Received FAIL records over the last 3 hours")
+                    : t("Last 3 hours · 15-minute production intervals")}
                 </p>
               </div>
               <span className="pulse-dot" />
@@ -309,37 +309,35 @@ export function Overview() {
             />
             <div className="activity-totals">
               <div>
-                <small>{failuresOnly ? "RECEIVED RECORDS" : "INSPECTED"}</small>
-                <strong>{summary.total.toLocaleString("en-US")}</strong>
+                <small>{failuresOnly ? t("RECEIVED RECORDS") : t("INSPECTED")}</small>
+                <strong>{summary.total.toLocaleString(language === "tr" ? "tr-TR" : "en-US")}</strong>
               </div>
               <div>
-                <small>REVIEWED</small>
+                <small>{t("REVIEWED")}</small>
                 <strong>{failuresOnly ? "—" : reviewed}</strong>
               </div>
               <div>
-                <small>PENDING</small>
+                <small>{t("PENDING")}</small>
                 <strong>{failuresOnly ? "—" : pending.length}</strong>
               </div>
             </div>
             <div className="chart-bottom">
               <ShieldCheck size={14} />
-              <span>
-                Data represents only the records received in this session.
-              </span>
+              <span>{t("Data represents only the records received in this session.")}{' '}</span>
             </div>
           </section>
         </div>
         <div className="overview-rail">
           <section className="panel health-panel">
             <div className="panel-heading">
-              <h2>{failuresOnly ? "Backend health" : "Station health"}</h2>
+              <h2>{failuresOnly ? t("Backend health") : t("Station health")}</h2>
               <Cpu size={17} />
             </div>
             <div className="health-headline">
               <small>
                 {failuresOnly
-                  ? "SPRING BOOT / ACTUATOR"
-                  : "TOTAL PROCESSING SPEED"}
+                  ? t("SPRING BOOT / ACTUATOR")
+                  : t("TOTAL PROCESSING SPEED")}
               </small>
               <div>
                 <strong>
@@ -348,7 +346,7 @@ export function Overview() {
                     : offline || error
                       ? "—"
                       : totalFps}
-                  <span>{failuresOnly ? "HTTP" : "FPS"}</span>
+                  <span>{failuresOnly ? t("HTTP") : t("FPS")}</span>
                 </strong>
                 <Badge
                   tone={
@@ -356,7 +354,7 @@ export function Overview() {
                   }
                 >
                   {failuresOnly
-                    ? "Health response"
+                    ? t("Health response")
                     : `${active}/${stations.length} active`}
                 </Badge>
               </div>
@@ -369,15 +367,12 @@ export function Overview() {
               </div>
               <p>
                 {failuresOnly
-                  ? "Backend health does not verify camera or model health."
-                  : "Camera and inference connection status"}
+                  ? t("Backend health does not verify camera or model health.")
+                  : t("Camera and inference connection status")}
               </p>
             </div>
             {failuresOnly && (
-              <p className="card-footnote">
-                Station/heartbeat data, FPS, and model versions are unavailable
-                from this API.
-              </p>
+              <p className="card-footnote">{t("Station/heartbeat data, FPS, and model versions are unavailable from this API.")}{' '}</p>
             )}
             <div className="health-stations">
               {stations.map((s) => (
@@ -387,7 +382,7 @@ export function Overview() {
                   </div>
                   <div>
                     <strong>{s.id}</strong>
-                    <small>{s.name}</small>
+                    <small>{t(s.name)}</small>
                   </div>
                   <StationBadge
                     station={s}
@@ -399,8 +394,7 @@ export function Overview() {
             </div>
             <div className="system-foot">
               <Cpu size={14} />
-              <span>
-                Model{" "}
+              <span>{t("Model")}{" "}
                 <strong>
                   {[...new Set(stations.map((s) => s.modelVersion))].join(
                     ", ",
@@ -408,26 +402,22 @@ export function Overview() {
                 </strong>
               </span>
               <span className="soft-label">
-                {mode === "demo" ? "ONNX · Demo" : "API metadata"}
+                {mode === "demo" ? t("ONNX · Demo") : t("API metadata")}
               </span>
             </div>
-            <Link className="preview-link" to="/stations">
-              View all stations <ArrowUpRight size={14} />
+            <Link className="preview-link" to="/stations">{t("View all stations")}{' '}<ArrowUpRight size={14} />
             </Link>
           </section>
           <section className="panel attention-panel">
             <div className="panel-heading">
               <h2>
-                {failuresOnly ? "Latest failure alerts" : "Awaiting review"}
+                {failuresOnly ? t("Latest failure alerts") : t("Awaiting review")}
               </h2>
               <Badge tone={pending.length ? "danger" : "success"}>
-                {pending.length} records
-              </Badge>
+                {pending.length}{' '}{t("records")}{' '}</Badge>
             </div>
             {!pending.length ? (
-              <p className="attention-empty">
-                No defect predictions are awaiting review.
-              </p>
+              <p className="attention-empty">{t("No defect predictions are awaiting review.")}{' '}</p>
             ) : (
               pending.slice(0, 2).map((e) => (
                 <button
@@ -439,48 +429,42 @@ export function Overview() {
                     <AlertTriangle size={15} />
                   </span>
                   <span>
-                    <strong>{e.category}</strong>
+                    <strong>{t(e.category)}</strong>
                     <small>
                       {e.stationId} · {e.id}
                     </small>
                   </span>
-                  <span className="attention-action">
-                    Review <ArrowUpRight size={12} />
+                  <span className="attention-action">{t("Review")}{' '}<ArrowUpRight size={12} />
                   </span>
                 </button>
               ))
             )}
-            <p className="card-footnote">
-              AI predictions are kept separate from operator confirmations.
-            </p>
+            <p className="card-footnote">{t("AI predictions are kept separate from operator confirmations.")}{' '}</p>
           </section>
           <section className="panel preview-panel">
             <div className="panel-heading">
-              <h2>Station preview</h2>
+              <h2>{t("Station preview")}</h2>
               <Badge
                 tone={failuresOnly ? "neutral" : healthy ? "success" : "danger"}
               >
                 {failuresOnly
-                  ? "No image API"
+                  ? t("No image API")
                   : !healthy
-                    ? "Check status"
+                    ? t("Check status")
                     : mode === "demo"
-                      ? "DEMO"
-                      : "API"}
+                      ? t("DEMO")
+                      : t("API")}
               </Badge>
             </div>
             <InspectionFrame event={events[0]} simulated={mode === "demo"} />
-            <Link className="preview-link" to="/monitoring">
-              Open live monitoring <ArrowUpRight size={14} />
+            <Link className="preview-link" to="/monitoring">{t("Open live monitoring")}{' '}<ArrowUpRight size={14} />
             </Link>
           </section>
         </div>
       </div>
       <div className="info-note safety-note">
         <ShieldCheck size={16} />
-        <span>
-          Monitoring and decision support only. No physical production controls.
-        </span>
+        <span>{t("Monitoring and decision support only. No physical production controls.")}{' '}</span>
       </div>
       {selected && (
         <EventDetail event={selected} onClose={() => setSelected(null)} />
@@ -490,6 +474,8 @@ export function Overview() {
 }
 
 export function Monitoring() {
+  const t = useT();
+  const { language } = useLanguage();
   const { snapshot, offline, error, preferences, mode, now, failuresOnly } =
     useApp();
   const [params, setParams] = useSearchParams();
@@ -518,9 +504,9 @@ export function Monitoring() {
     <>
       <div className="section-top">
         <label>
-          {failuresOnly ? "Select line" : "Select station"}
+          {failuresOnly ? t("Select line") : t("Select station")}
           <select
-            aria-label={failuresOnly ? "Select line" : "Select station"}
+            aria-label={failuresOnly ? t("Select line") : t("Select station")}
             value={station}
             onChange={(e) => {
               setParams(
@@ -533,7 +519,7 @@ export function Monitoring() {
           >
             {failuresOnly ? (
               <>
-                <option value="all">All lines</option>
+                <option value="all">{t("All lines")}</option>
                 {lines.map((line) => (
                   <option key={line}>{line}</option>
                 ))}
@@ -541,20 +527,20 @@ export function Monitoring() {
             ) : (
               !source && (
                 <option value={station}>
-                  {station ? `${station} · Station not found` : "No stations"}
+                  {station ? `${station} · Station not found` : t("No stations")}
                 </option>
               )
             )}
             {snapshot?.stations.map((s) => (
               <option key={s.id} value={s.id}>
-                {s.id} · {s.name}
+                {s.id} · {t(s.name)}
               </option>
             ))}
           </select>
         </label>
         <button onClick={toggle} disabled={!event}>
           {paused ? <Play size={16} /> : <Pause size={16} />}{" "}
-          {paused ? "Resume view" : "Pause view"}
+          {paused ? t("Resume view") : t("Pause view")}
         </button>
       </div>
       <div className="monitor-grid">
@@ -563,11 +549,11 @@ export function Monitoring() {
             <h2>
               {failuresOnly
                 ? station === "all"
-                  ? "All lines"
+                  ? t("All lines")
                   : station
                 : station || "No stations"}{" "}
               ·{" "}
-              {mode === "demo" ? "Visual simulation" : "Latest failure record"}
+              {mode === "demo" ? t("Visual simulation") : t("Latest failure record")}
             </h2>
             <Badge
               tone={
@@ -584,29 +570,29 @@ export function Monitoring() {
             >
               {failuresOnly
                 ? error
-                  ? "Disconnected"
+                  ? t("Disconnected")
                   : paused
-                    ? "View paused"
-                    : "Camera feed unavailable"
+                    ? t("View paused")
+                    : t("Camera feed unavailable")
                 : health !== "active"
-                  ? statusLabels[health]
+                  ? t(statusLabels[health])
                   : paused
-                    ? "View paused"
+                    ? t("View paused")
                     : mode === "demo"
-                      ? "Simulation active"
-                      : "Monitoring active"}
+                      ? t("Simulation active")
+                      : t("Monitoring active")}
             </Badge>
           </div>
           <InspectionFrame event={event} large simulated={mode === "demo"} />
           <p className="info-note">
             {failuresOnly
-              ? "Pausing freezes this view; API polling continues."
-              : "Pausing freezes only this view. Data collection and other screens keep updating; physical production continues."}
+              ? t("Pausing freezes this view; API polling continues.")
+              : t("Pausing freezes only this view. Data collection and other screens keep updating; physical production continues.")}
           </p>
         </section>
         <section className="panel decision-panel">
           <span className="eyebrow">
-            {failuresOnly ? "LATEST QUALITY DECISION" : "LATEST AI DECISION"}
+            {failuresOnly ? t("LATEST QUALITY DECISION") : t("LATEST AI DECISION")}
           </span>
           <div
             className={`decision-symbol ${!event ? "unknown" : event.decision === "reject" ? "bad" : ""}`}
@@ -619,11 +605,11 @@ export function Monitoring() {
               <CheckCheck size={38} />
             )}
           </div>
-          <h2>{event?.category || "Waiting for data"}</h2>
+          <h2>{t(event?.category || "Waiting for data")}</h2>
           <p className="muted">{event?.id}</p>
           <div className="detail-grid">
             <div>
-              <small>Model confidence</small>
+              <small>{t("Model confidence")}</small>
               <strong>
                 {event && event.confidence !== null
                   ? `${(event.confidence * 100).toFixed(1)}%`
@@ -631,19 +617,18 @@ export function Monitoring() {
               </strong>
             </div>
             <div>
-              <small>Model</small>
+              <small>{t("Model")}</small>
               <strong>{event?.modelVersion || "—"}</strong>
             </div>
             <div>
-              <small>Detection time</small>
+              <small>{t("Detection time")}</small>
               <strong>
-                {event ? formatDate(event.timestamp, preferences.zone) : "—"}
+                {event ? formatDate(event.timestamp, preferences.zone, language === "tr" ? "tr-TR" : "en-US") : "—"}
               </strong>
             </div>
           </div>
           {event && (
-            <button onClick={() => setSelected(event)}>
-              Open inspection details <ArrowUpRight size={16} />
+            <button onClick={() => setSelected(event)}>{t("Open inspection details")}{' '}<ArrowUpRight size={16} />
             </button>
           )}
         </section>
@@ -651,9 +636,9 @@ export function Monitoring() {
       <section className="panel">
         <div className="panel-heading">
           <h2>
-            {failuresOnly ? "Latest failures by line" : "Latest station alerts"}
+            {failuresOnly ? t("Latest failures by line") : t("Latest station alerts")}
           </h2>
-          <span className="soft-label">AI predictions</span>
+          <span className="soft-label">{t("AI predictions")}</span>
         </div>
         <EventTable
           events={events.filter((e) => e.decision === "reject").slice(0, 5)}
@@ -667,21 +652,22 @@ export function Monitoring() {
   );
 }
 export function Stations() {
+  const t = useT();
+  const { language } = useLanguage();
   const { snapshot, offline, error, preferences, now, mode } = useApp();
   return (
     <>
-      <p className="muted">
-        Stations are monitored in read-only mode.{" "}
+      <p className="muted">{t("Stations are monitored in read-only mode.")}{" "}
         {mode === "demo"
-          ? "Connections are simulated in the demo environment."
-          : "The Nivect backend provides no station, camera, or heartbeat endpoint."}
+          ? t("Connections are simulated in the demo environment.")
+          : t("The Nivect backend provides no station, camera, or heartbeat endpoint.")}
       </p>
       {!snapshot?.stations.length && (
         <section className="panel">
-          <EmptyState title="No station records">
+          <EmptyState title={t("No station records")}>
             {mode === "demo"
-              ? "No station information has been received from the data source yet."
-              : "Camera connection status is not assumed. Backend health is shown on the Overview screen."}
+              ? t("No station information has been received from the data source yet.")
+              : t("Camera connection status is not assumed. Backend health is shown on the Overview screen.")}
           </EmptyState>
         </section>
       )}
@@ -699,11 +685,11 @@ export function Stations() {
                     : "danger"
                 }
               >
-                {statusLabels[stationStatus(s, !offline && !error, now)]}
+                {t(statusLabels[stationStatus(s, !offline && !error, now)])}
               </Badge>
             </div>
             <h2>{s.id}</h2>
-            <p>{s.name}</p>
+            <p>{t(s.name)}</p>
             <div className="spec-list">
               {[
                 ["Production line", "Production Line 01"],
@@ -715,7 +701,7 @@ export function Stations() {
                   "Inference status",
                   offline || error ? "Unknown" : statusLabels[s.inference],
                 ],
-                ["Last heartbeat", formatDate(s.heartbeat, preferences.zone)],
+                ["Last heartbeat", formatDate(s.heartbeat, preferences.zone, language === "tr" ? "tr-TR" : "en-US")],
                 ["Model version", s.modelVersion],
                 [
                   "Processing speed",
@@ -729,16 +715,15 @@ export function Stations() {
                 ],
               ].map(([k, v]) => (
                 <div key={k}>
-                  <span>{k}</span>
-                  <strong>{v}</strong>
+                  <span>{t(k)}</span>
+                  <strong>{t(v)}</strong>
                 </div>
               ))}
             </div>
             <Link
               to={`/monitoring?station=${encodeURIComponent(s.id)}`}
               className="preview-link"
-            >
-              Go to monitoring <ArrowUpRight size={16} />
+            >{t("Go to monitoring")}{' '}<ArrowUpRight size={16} />
             </Link>
           </section>
         ))}
@@ -747,9 +732,11 @@ export function Stations() {
   );
 }
 export function Reports() {
+  const t = useT();
+  const { language } = useLanguage();
   const { snapshot, preferences, failuresOnly } = useApp();
   const [filters, setFilters] = useState<Filters>(emptyFilters);
-  const events = filterEvents(snapshot?.events || [], filters);
+  const events = filterEvents(snapshot?.events || [], filters, t, language);
   const m = metrics(events);
   const defectTypes = categories
     .slice(1)
@@ -771,46 +758,39 @@ export function Reports() {
     <>
       <div className="section-top">
         <div className="date-controls">
-          <label>
-            Start date
-            <input
+          <label>{t("Start date")}{' '}<input
               type="date"
-              aria-label="Start date"
+              aria-label={t("Start date")}
               max={filters.to || undefined}
               value={filters.from}
               onChange={(e) => setFilters({ ...filters, from: e.target.value })}
             />
           </label>
-          <label>
-            End date
-            <input
+          <label>{t("End date")}{' '}<input
               type="date"
-              aria-label="End date"
+              aria-label={t("End date")}
               min={filters.from}
               value={filters.to}
               onChange={(e) => setFilters({ ...filters, to: e.target.value })}
             />
           </label>
-          <button onClick={() => setFilters(emptyFilters)}>
-            Entire session
-          </button>
-          <small>Date boundaries: Istanbul (UTC+3)</small>
+          <button onClick={() => setFilters(emptyFilters)}>{t("Entire session")}{' '}</button>
+          <small>{t("Date boundaries: Istanbul (UTC+3)")}</small>
         </div>
         <ExportButton events={events} />
       </div>
       <MetricRow events={events} />
       {!events.length ? (
         <section className="panel">
-          <EmptyState title="No data in this date range" />
+          <EmptyState title={t("No data in this date range")} />
         </section>
       ) : (
         <div className="reports-grid">
           <section className="panel">
             <div className="panel-heading">
-              <h2>Defect distribution</h2>
+              <h2>{t("Defect distribution")}</h2>
               <span className="soft-label">
-                {m.defective} records · {defectCount} defects
-              </span>
+                {m.defective}{' '}{t("records ·")}{' '}{defectCount}{' '}{t("defects")}{' '}</span>
             </div>
             <div className="distribution">
               {defectTypes.map((c, i) => {
@@ -820,8 +800,8 @@ export function Reports() {
                 return (
                   <div key={c}>
                     <div>
-                      <span>{c}</span>
-                      <strong>{count} units</strong>
+                      <span>{t(c)}</span>
+                      <strong>{count}{' '}{t("units")}</strong>
                     </div>
                     <div className="bar-track">
                       <div
@@ -845,10 +825,10 @@ export function Reports() {
             <div className="panel-heading">
               <h2>
                 {failuresOnly
-                  ? "Failure records by line"
-                  : "Station comparison"}
+                  ? t("Failure records by line")
+                  : t("Station comparison")}
               </h2>
-              <span className="soft-label">Selected period</span>
+              <span className="soft-label">{t("Selected period")}</span>
             </div>
             <div className="spec-list">
               {[
@@ -876,22 +856,19 @@ export function Reports() {
                 );
               })}
             </div>
-            <p className="info-note">
-              This report shows operational AI predictions. Labeled ground truth
-              is required to measure recall and false reject rates.
-            </p>
+            <p className="info-note">{t("This report shows operational AI predictions. Labeled ground truth is required to measure recall and false reject rates.")}{' '}</p>
           </section>
           <section className="panel wide">
             <div className="panel-heading">
-              <h2>Inspection trend</h2>
-              <span className="soft-label">Selected period · All records</span>
+              <h2>{t("Inspection trend")}</h2>
+              <span className="soft-label">{t("Selected period · All records")}</span>
             </div>
             <TrendChart
               events={events}
               start={Math.min(chartStart, chartEnd - 1)}
               end={chartEnd}
               zone={preferences.zone}
-              period="Selected period"
+              period={t("Selected period")}
             />
           </section>
         </div>
@@ -900,19 +877,18 @@ export function Reports() {
   );
 }
 export function Settings() {
+  const t = useT();
+  const { language, setLanguage } = useLanguage();
   const { preferences, setPreferences, setToast, mode, offline, setOffline } =
     useApp();
   return (
     <div className="settings-layout">
       <section className="panel settings-panel">
-        <h2>Interface preferences</h2>
-        <p className="muted">
-          Preferences are stored in this browser and applied immediately.
-        </p>
-        <label>
-          Refresh interval
-          <select
-            aria-label="Refresh interval"
+        <h2>{t("Interface preferences")}</h2>
+        <label>{t("Interface language")}<select aria-label={t("Interface language")} value={language} onChange={(e) => setLanguage(e.target.value as "tr" | "en")}><option value="tr">Türkçe</option><option value="en">English</option></select></label>
+        <p className="muted">{t("Preferences are stored in this browser and applied immediately.")}{' '}</p>
+        <label>{t("Refresh interval")}{' '}<select
+            aria-label={t("Refresh interval")}
             value={preferences.interval}
             onChange={(e) =>
               setPreferences({
@@ -921,30 +897,26 @@ export function Settings() {
               })
             }
           >
-            <option value={3000}>3 seconds</option>
-            <option value={5000}>5 seconds</option>
-            <option value={10000}>10 seconds</option>
+            <option value={3000}>{t("3 seconds")}</option>
+            <option value={5000}>{t("5 seconds")}</option>
+            <option value={10000}>{t("10 seconds")}</option>
           </select>
         </label>
-        <label>
-          Time zone
-          <select
-            aria-label="Time zone"
+        <label>{t("Time zone")}{' '}<select
+            aria-label={t("Time zone")}
             value={preferences.zone}
             onChange={(e) =>
               setPreferences({ ...preferences, zone: e.target.value })
             }
           >
-            <option value="Europe/Istanbul">Istanbul (UTC+3)</option>
-            <option value="UTC">UTC</option>
+            <option value="Europe/Istanbul">{t("Istanbul (UTC+3)")}</option>
+            <option value="UTC">{t("UTC")}</option>
           </select>
         </label>
         <label className="toggle-row">
           <span>
-            <strong>Action notifications</strong>
-            <small>
-              Show notifications for CSV exports and connection actions.
-            </small>
+            <strong>{t("Action notifications")}</strong>
+            <small>{t("Show notifications for CSV exports and connection actions.")}{' '}</small>
           </span>
           <input
             type="checkbox"
@@ -959,8 +931,8 @@ export function Settings() {
         </label>
         <label className="toggle-row">
           <span>
-            <strong>Compact table</strong>
-            <small>Reduce row spacing in inspection tables.</small>
+            <strong>{t("Compact table")}</strong>
+            <small>{t("Reduce row spacing in inspection tables.")}</small>
           </span>
           <input
             type="checkbox"
@@ -972,21 +944,20 @@ export function Settings() {
         </label>
       </section>
       <section className="panel settings-panel">
-        <h2>Demo and connection</h2>
-        <p className="muted">
-          Active data source:{" "}
+        <h2>{t("Demo and connection")}</h2>
+        <p className="muted">{t("Active data source:")}{" "}
           <strong>
             {mode === "demo"
-              ? "Local simulation"
-              : "Live API (Nivect contract)"}
+              ? t("Local simulation")
+              : t("Live API (Nivect contract)")}
           </strong>
         </p>
         <div className="notice">
           <ShieldCheck size={22} />
           <span>
             {mode === "demo"
-              ? "The demo is not connected to production systems. All records and images are illustrative."
-              : "API mode is active. Connection errors do not fall back to demo data. Live record changes are disabled."}
+              ? t("The demo is not connected to production systems. All records and images are illustrative.")
+              : t("API mode is active. Connection errors do not fall back to demo data. Live record changes are disabled.")}
           </span>
         </div>
         <button
@@ -1001,19 +972,13 @@ export function Settings() {
               );
           }}
         >
-          {offline ? "Restore demo connection" : "Simulate connection outage"}
+          {offline ? t("Restore demo connection") : t("Simulate connection outage")}
         </button>
         <hr />
-        <h3>Integration scope</h3>
-        <p className="muted">
-          The Nivect Spring Boot address is configured through the development
-          proxy (default port 8080). Approved APIs for user management, camera
-          configuration, and model updates are not available.
-        </p>
-        <Badge tone="warning">Advanced configuration unavailable</Badge>
-        <p className="muted">
-          OCR / batch and expiry date inspection: Phase 2.
-        </p>
+        <h3>{t("Integration scope")}</h3>
+        <p className="muted">{t("The Nivect Spring Boot address is configured through the development proxy (default port 8080). Approved APIs for user management, camera configuration, and model updates are not available.")}{' '}</p>
+        <Badge tone="warning">{t("Advanced configuration unavailable")}</Badge>
+        <p className="muted">{t("OCR / batch and expiry date inspection: Phase 2.")}{' '}</p>
       </section>
     </div>
   );

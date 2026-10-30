@@ -1554,3 +1554,11 @@ body {
 .detail-grid strong {
   overflow-wrap: anywhere;
 }
+
+.cloud-shell .language-switch select {
+  min-height: 36px; padding: 6px 9px; border: 1px solid #cbd9e4;
+  border-radius: 10px; background: #fff; color: #203649; cursor: pointer;
+  font-size: 13px; font-weight: 600;
+}
+.cloud-shell .language-switch select:focus-visible { outline: 3px solid #16849a; outline-offset: 2px; }
+@media (max-width: 600px) { .cloud-shell .language-switch select { min-height: 32px; max-width: 88px; font-size: 11px; padding: 4px; } }

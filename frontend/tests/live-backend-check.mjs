@@ -15,6 +15,7 @@ async function main() {
   });
   try {
     const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+    await page.addInitScript(() => localStorage.setItem("visionqc.language", "en"));
     const errors = [];
     page.on("pageerror", (error) => errors.push(error.message));
     await page.goto(`${origin}/history`, { waitUntil: "networkidle" });

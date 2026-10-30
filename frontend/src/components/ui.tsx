@@ -1,3 +1,4 @@
+import { useLanguage, useT } from '../i18n';
 import { stationStatus, statusLabels, activityBins } from "../domain";
 import { useEffect, useRef, useState, useId } from "react";
 import type { ReactNode } from "react";
@@ -57,11 +58,12 @@ export function EmptyState({
   title?: string;
   children?: ReactNode;
 }) {
+  const t = useT();
   return (
     <div className="empty">
       <Camera size={30} />
-      <h3>{title}</h3>
-      <p>{children || "Adjust your filters and try again."}</p>
+      <h3>{t(title)}</h3>
+      <p>{typeof children === "string" ? t(children) : children || t("Adjust your filters and try again.")}</p>
     </div>
   );
 }
@@ -72,14 +74,15 @@ export function ErrorState({
   message: string;
   retry: () => void;
 }) {
+  const t = useT();
   return (
     <div className="notice error" role="alert">
       <AlertTriangle size={22} />
       <div>
-        <strong>Could not connect to data source</strong>
-        <p>{message} · The latest data may be out of date.</p>
+        <strong>{t("Could not connect to data source")}</strong>
+        <p>{t(message)}{' '}{t("· The latest data may be out of date.")}</p>
       </div>
-      <button onClick={retry}>Try again</button>
+      <button onClick={retry}>{t("Try again")}</button>
     </div>
   );
 }
@@ -92,6 +95,7 @@ export function Modal({
   children: ReactNode;
   onClose: () => void;
 }) {
+  const t = useT();
   const ref = useRef<HTMLDialogElement>(null);
   useEffect(() => {
     const dialog = ref.current;
@@ -110,7 +114,7 @@ export function Modal({
       <div className="dialog-heading">
         <h2>{title}</h2>
         <button
-          aria-label="Close dialog"
+          aria-label={t("Close dialog")}
           className="icon-button"
           onClick={onClose}
         >
@@ -130,13 +134,12 @@ export function InspectionFrame({
   large?: boolean;
   simulated?: boolean;
 }) {
+  const t = useT();
   const gradientId = useId();
   const reject = event?.decision === "reject";
   if (!event)
     return (
-      <EmptyState title="No inspection image">
-        No inspection record has been received for this station yet.
-      </EmptyState>
+      <EmptyState title={t("No inspection image")}>{t("No inspection record has been received for this station yet.")}{' '}</EmptyState>
     );
   if (event?.imageUrl)
     return (
@@ -144,24 +147,22 @@ export function InspectionFrame({
     );
   if (!simulated)
     return (
-      <EmptyState title="No inspection image">
-        No image was provided for this event. Event details are preserved.
-      </EmptyState>
+      <EmptyState title={t("No inspection image")}>{t("No image was provided for this event. Event details are preserved.")}{' '}</EmptyState>
     );
   return (
     <div
       className={`inspection-frame ${large ? "large" : ""}`}
       role="img"
-      aria-label={`Illustrative bottle image, ${event?.category || "Pass"}. This is not a real camera image.`}
+      aria-label={t("Illustrative bottle image, {category}. This is not a real camera image.").replace("{category}", t(event?.category || "Pass"))}
     >
       <div className="frame-grid" />
       <div className="frame-meta">
-        <span>CAMERA / {event?.stationId || "CAM-01"}</span>
-        <span>SIMULATED FRAME</span>
+        <span>{t("CAMERA /")}{' '}{event?.stationId || "CAM-01"}</span>
+        <span>{t("SIMULATED FRAME")}</span>
       </div>
       <div className={`detection ${reject ? "reject" : ""}`}>
         <span>
-          {reject ? event.category : "PRODUCT DETECTED"} ·{" "}
+          {reject ? t(event.category) : t("PRODUCT DETECTED")} ·{" "}
           {event.confidence !== null
             ? `${(event.confidence * 100).toFixed(1)}%`
             : "—"}
@@ -250,9 +251,7 @@ export function InspectionFrame({
                 fill="#1d6b99"
                 fontSize="18"
                 fontFamily="Georgia"
-              >
-                RON 88
-              </text>
+              >{t("RON 88")}{' '}</text>
               <text
                 x="90"
                 y="175"
@@ -260,18 +259,14 @@ export function InspectionFrame({
                 fill="#337da4"
                 fontSize="5"
                 letterSpacing="2"
-              >
-                NATURAL SPRING WATER
-              </text>
+              >{t("NATURAL SPRING WATER")}{' '}</text>
               <text
                 x="90"
                 y="201"
                 textAnchor="middle"
                 fill="#a4d9ed"
                 fontSize="6"
-              >
-                PET · DEMO
-              </text>
+              >{t("PET · DEMO")}{' '}</text>
             </g>
           )}
           <path
@@ -283,20 +278,19 @@ export function InspectionFrame({
         </svg>
       </div>
       <div className="frame-footer">
-        <span>Illustrative image · Not a live camera feed</span>
+        <span>{t("Illustrative image · Not a live camera feed")}</span>
         <span>1920 × 1080</span>
       </div>
     </div>
   );
 }
 function CapturedImage({ url, id }: { url: string; id: string }) {
+  const t = useT();
   const [failed, setFailed] = useState(false);
   return (
     <div className="image-frame">
       {failed ? (
-        <p role="status">
-          Could not load image. Event details are preserved below.
-        </p>
+        <p role="status">{t("Could not load image. Event details are preserved below.")}{' '}</p>
       ) : (
         <img
           src={url}
@@ -320,6 +314,8 @@ export function TrendChart({
   zone?: string;
   period?: string;
 }) {
+  const t = useT();
+  const { language } = useLanguage();
   const areaId = useId();
   const dateOptions: Intl.DateTimeFormatOptions = {
     hour: "2-digit",
@@ -329,7 +325,7 @@ export function TrendChart({
   };
   const bins = activityBins(events, start, end).map((b) => ({
     ...b,
-    label: new Intl.DateTimeFormat("en-US", dateOptions).format(b.start),
+    label: new Intl.DateTimeFormat(language === "tr" ? "tr-TR" : "en-US", dateOptions).format(b.start),
   }));
   const total = bins.reduce((n, b) => n + b.total, 0);
   const bad = bins.reduce((n, b) => n + b.bad, 0);
@@ -341,14 +337,11 @@ export function TrendChart({
     <div className="chart-wrap">
       <div className="legend">
         <span>
-          <i /> Inspected products
-        </span>
+          <i />{' '}{t("Inspected products")}{' '}</span>
         <span>
-          <i className="red" /> Defective products
-        </span>
+          <i className="red" />{' '}{t("Defective products")}{' '}</span>
         <small>
-          {period} · {zone === "UTC" ? "UTC" : "Istanbul"} · 12 equal intervals
-        </small>
+          {period} · {zone === "UTC" ? t("UTC") : t("Istanbul")}{' '}{t("· 12 equal intervals")}{' '}</small>
       </div>
       <svg
         viewBox="0 0 740 220"
@@ -396,8 +389,7 @@ export function TrendChart({
               fill="#119d8c"
             >
               <title>
-                {b.label}: {b.total} products
-              </title>
+                {b.label}: {b.total}{' '}{t("products")}{' '}</title>
             </circle>
             <rect
               x={36 + i * 60}
@@ -435,6 +427,7 @@ export function StationBadge({
   now?: number;
 }) {
   const status = stationStatus(station, connected, now);
+  const t = useT();
   return (
     <Badge
       tone={
@@ -445,7 +438,7 @@ export function StationBadge({
             : "danger"
       }
     >
-      {status === "active" ? `${station.fps} FPS` : statusLabels[status]}
+      {status === "active" ? `${station.fps} FPS` : t(statusLabels[status])}
     </Badge>
   );
 }
