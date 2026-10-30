@@ -12,7 +12,7 @@ export const FAILURE_PATH = "/api/v1/inspections/failures";
 export const HEALTH_PATH = "/actuator/health";
 export const petProduct = "Ron 88 · PET water bottle";
 export const backendOffset =
-  import.meta.env.VITE_BACKEND_UTC_OFFSET || "+03:00";
+  import.meta.env.VITE_BACKEND_UTC_OFFSET || "Z";
 const localTimestamp = z
   .string()
   .regex(

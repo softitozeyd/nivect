@@ -174,7 +174,13 @@ export default function App() {
             <div>
               <div className="eyebrow">VISIONQC / OPERATIONS CENTER</div>
               <h1>{current?.label || "Page not found"}</h1>
-              <p>{descriptions[location.pathname]}</p>
+              <p>
+                {mode === "api" && location.pathname === "/monitoring"
+                  ? "View the latest available failure record."
+                  : mode === "api" && location.pathname === "/history"
+                    ? "Find and inspect recent failure records."
+                    : descriptions[location.pathname]}
+              </p>
             </div>
             <div className="heading-actions">
               <span className="line-button" title="MVP: one production line">

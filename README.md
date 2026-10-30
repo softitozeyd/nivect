@@ -14,6 +14,18 @@ powershell -ExecutionPolicy Bypass -File ./scripts/test-backend.ps1
 Backend varsayilan olarak `http://localhost:8080` adresindedir. Parolalar yerel
 `.env` dosyasindan alinir ve Docker imajina dahil edilmez.
 
+Frontend ve backend'i birlikte calistirmak icin:
+
+```powershell
+docker compose -f compose.yaml -f compose.frontend.yaml --profile app up -d --build --wait --wait-timeout 180
+powershell -ExecutionPolicy Bypass -File ./scripts/test-frontend.ps1
+```
+
+Panel `http://localhost:5197` adresindedir. Bu API, son 20 FAIL kaydini ve
+backend sagligini sunar; tum uretim sayisi, kamera goruntusu ve PASS gecmisi
+su an sunulmaz. Docker backend saat dilimi UTC'dir; eski kayitlarin zaman
+dilimi kaynagina gore ayrica dogrulanmalidir.
+
 Şeffaf PET su şişelerinde YOLO ile şişe ve kusur tespiti: `underfill` (düşük dolum), `missing_cap` (kapaksız), `loose_cap` (gevşek kapak).
 
 ## Dosyalar

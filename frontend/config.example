@@ -3,5 +3,5 @@ VITE_DATA_MODE=demo
 # Empty uses the same-origin Vite/Nginx proxy.
 VITE_API_BASE_URL=
 VITE_BACKEND_TARGET=http://127.0.0.1:8080
-# Assumption for Spring LocalDateTime (not provided by API): verify server timezone.
-VITE_BACKEND_UTC_OFFSET=+03:00
+# Docker backend writes LocalDateTime in UTC. Other runtimes may differ.
+VITE_BACKEND_UTC_OFFSET=Z

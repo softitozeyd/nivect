@@ -369,7 +369,9 @@ export function EventDetail({
                   "false-positive": "False positive",
                   flagged: "Flagged for review",
                 }[saved.outcome]
-              : "Not reviewed yet",
+              : mode === "api"
+                ? "Review status unavailable"
+                : "Not reviewed yet",
           ],
         ].map(([key, value]) => (
           <div key={key}>
@@ -393,14 +395,15 @@ export function EventDetail({
       {saved?.note && <p className="notice">Operator note: {saved.note}</p>}
       <h3>Operator review</h3>
       <p className="muted">
-        The AI prediction stays unchanged. Demo reviews are stored only for this
-        session.
+        {mode === "api"
+          ? "Operator reviews are unavailable for live records."
+          : "The AI prediction stays unchanged. Demo reviews are stored only for this session."}
       </p>
       <label>
         Review outcome
         <select
           aria-label="Review outcome"
-          disabled={busy || confirm}
+          disabled={unavailable || busy || confirm}
           value={outcome}
           onChange={(e) => {
             const v = e.target.value;
@@ -417,7 +420,7 @@ export function EventDetail({
         Operator note
         <textarea
           maxLength={500}
-          disabled={busy || confirm}
+          disabled={unavailable || busy || confirm}
           rows={3}
           value={note}
           onChange={(e) => setNote(e.target.value)}

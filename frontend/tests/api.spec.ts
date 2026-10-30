@@ -10,7 +10,7 @@ function fixture(now = Date.now()) {
       liquidLevelOk: false,
       overallResult: "FAIL",
       imagePath: "C:\\captures\\bottle.jpg",
-      inspectedAt: new Date(now + 3 * 3600000).toISOString().replace("Z", ""),
+      inspectedAt: new Date(now).toISOString().replace("Z", ""),
     },
   ];
 }

@@ -38,7 +38,7 @@ Eşleme: capOk=false → Kapak hatası; labelOk=false → Etiket hatası; liquid
 
 ## ASSUMPTIONS
 
-Backend timestamp saat dilimsizdir. Varsayılan +03:00 yalnızca belgelenmiş geliştirme varsayımıdır; server timezone teyit edilmelidir. Nanosaniye değerler milisaniyeye indirilip UTC'ye normalleştirilir. Frontend/env yalnızca API adresi, mod ve saat farkı taşır; secret taşımaz.
+Backend timestamp saat dilimsizdir. Docker JVM UTC olarak yapılandırılmıştır ve frontend varsayılan olarak Z kullanır. Geçmiş kayıtların saat dilimi ayrıca teyit edilmelidir; IDE veya farklı sunucularda timezone farklı olabilir. Nanosaniye değerler milisaniyeye indirilip UTC'ye normalleştirilir. Frontend/env yalnızca API adresi, mod ve saat farkı taşır; secret taşımaz.
 
 ## NOT AVAILABLE / sonraki ekip işleri
 

@@ -53,6 +53,9 @@ it("preserves simultaneous cap, label and liquid findings separately", () => {
   });
 });
 it("normalizes Java LocalDateTime with an explicit server offset", () => {
+  expect(normalizeInspectedAt("2026-10-27T12:00:00")).toBe(
+    "2026-10-27T12:00:00.000Z",
+  );
   expect(normalizeInspectedAt("2026-10-27T12:00", "+03:00")).toBe(
     "2026-10-27T09:00:00.000Z",
   );

@@ -8,13 +8,13 @@ Demo: `npm run dev -- --port 5197 --strictPort`. API: `npm run dev:api -- --port
 
 `VITE_API_BASE_URL` boş olunca same-origin proxy kullanılır. Doğrudan başka origin seçilirse backend CORS izinlerini ekip ayarlamalıdır; mevcut backend CORS sunmadığı için varsayılan proxy bu ihtiyacı kaldırır. Frontend gerçek API isteği başarısız olursa demo verisine geçmez.
 
-`VITE_BACKEND_UTC_OFFSET` backend'in saat dilimsiz LocalDateTime değerine uygulanır. +03:00 varsayımı doğrulanmalıdır. Gerçek server UTC kullanıyorsa Z seçilir. Model confidence ve model version alanları gönderilmediği için yok gösterilir. Dosya imagePath değerleri otomatik URL veya yerel dosya erişimine çevrilmez.
+`VITE_BACKEND_UTC_OFFSET` backend'in saat dilimsiz LocalDateTime değerine uygulanır. Docker backend JVM UTC kullanır, frontend varsayılanı Z'dir. Yerel Vite çalıştırması/derlemesi farklı bir sunucuya bağlanacaksa offset ortam değişkeniyle ayarlanabilir; Docker frontend varsayılan UTC backend için derlenir. Başka ortamda çalışan backend ve eski kayıtlar için offset ayrıca doğrulanmalıdır. Model confidence ve model version alanları gönderilmediği için yok gösterilir. Dosya imagePath değerleri otomatik URL veya yerel dosya erişimine çevrilmez.
 
 ## Monorepo / Docker
 
 Frontend'i `frontend/` klasöründe tutun. `frontend/compose.frontend.yaml` dosyası depo kökünde `compose.frontend.yaml` olarak kullanılır. Mevcut compose.yaml korunur. Backend ortamı kendi ekip kurulumuyla hazırlandıktan sonra `docker compose -f compose.yaml -f compose.frontend.yaml --profile app up -d --build`.
 
-Nginx backend:8080 adresine yalnızca GET failures ve health isteklerini iletir. SPA deep-link fallback hazır. API modu build: `npm run build:api`. Container sadece localhost:5197'ye bağlanır. Auth eklenene kadar bu paket üretim/LAN/Internet yayını sayılmaz. Docker motoru bu çalışma sırasında kapalıydı; Docker build/up çalıştırılamadı.
+Nginx backend:8080 adresine yalnızca GET failures ve health isteklerini iletir. SPA deep-link fallback hazır. API modu build: `npm run build:api`. Container sadece localhost:5197'ye bağlanır. Auth eklenene kadar bu paket üretim/LAN/Internet yayını sayılmaz.
 
 ## Eksik backend kaynakları
 

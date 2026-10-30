@@ -177,7 +177,7 @@ export function Overview() {
             <div className="panel-heading">
               <div>
                 <h2>
-                  AI inspection center{" "}
+                  {failuresOnly ? "Inspection center" : "AI inspection center"}{" "}
                   <span className="count">{summary.total}</span>
                 </h2>
                 <p>
@@ -215,7 +215,11 @@ export function Overview() {
             </div>
             <EventTable events={rows} onSelect={setSelected} recommendations />
             <div className="queue-footer">
-              <span>Open an event to view its image and review.</span>
+              <span>
+                {failuresOnly
+                  ? "Open an event to view the available details."
+                  : "Open an event to view its image and review."}
+              </span>
               <Link className="text-link" to="/history">
                 View all records <ArrowUpRight size={14} />
               </Link>
@@ -595,8 +599,9 @@ export function Monitoring() {
           </div>
           <InspectionFrame event={event} large simulated={mode === "demo"} />
           <p className="info-note">
-            Pausing freezes only this view. Data collection and other screens
-            keep updating; physical production continues.
+            {failuresOnly
+              ? "Pausing freezes this view; API polling continues."
+              : "Pausing freezes only this view. Data collection and other screens keep updating; physical production continues."}
           </p>
         </section>
         <section className="panel decision-panel">

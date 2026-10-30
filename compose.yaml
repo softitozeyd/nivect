@@ -6,6 +6,7 @@ services:
     build: .
     restart: unless-stopped
     environment:
+      JAVA_TOOL_OPTIONS: "-Duser.timezone=UTC"
       POSTGRES_HOST: postgres
       POSTGRES_PORT: 5432
       POSTGRES_DB: ${POSTGRES_DB:-nivect}
