@@ -1,0 +1,17 @@
+# Optional trained-model service. No host port is published.
+services:
+  vision:
+    build:
+      context: .
+      dockerfile: camera/Dockerfile
+    restart: unless-stopped
+    environment:
+      QC_MODEL_PATH: /models/best.pt
+      QC_MODEL_DEVICE: cpu
+    volumes:
+      - ./models:/models:ro
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:9000/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 10

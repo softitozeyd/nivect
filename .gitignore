@@ -46,3 +46,18 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
+# Product build and local camera state
+node_modules/
+src/main/resources/static/
+frontend/test-results/
+frontend/playwright-report/
+runtime/
+.venv/
+*.sqlite3
+*.sqlite3-wal
+*.sqlite3-shm
+models/
+data/
+test-results/
+.venv

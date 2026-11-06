@@ -1,44 +1,104 @@
-# VisionQC PET: Ron 88 şişe kusur tespiti (v1)
+# Nivect — PET Visual Quality
 
-## Backend gelistirme altyapisi
+PET şişe kalite kontrolü için ürün temeli: Türkçe web arayüzü, operatör oturumu,
+PC kamera önizlemesi, yerel model servisi, kalıcı inceleme kayıtları ve MQTT adaptörü.
 
-PostgreSQL, Redis ve Mosquitto yerel kurulumu icin [altyapi rehberi](docs/infrastructure.md).
-Spring Boot backend'i altyapiyla birlikte baslatmak ve test etmek icin:
+**Model henüz depoda yok.** Kamera önizlemesi ve kayıt yönetimi çalışır; gerçek
+kusur tespiti için eğitilmiş, sınıf sırası doğrulanmış `best.pt` gerekir.
+Mevcut kapsam: `bottle`, `underfill`, `missing_cap`, `loose_cap`.
+Etiket ve yabancı madde bu modelin kabul kapsamında değildir.
 
-```powershell
-powershell -ExecutionPolicy Bypass -File ./scripts/setup-dev.ps1
-docker compose --profile app up -d --build --wait --wait-timeout 180
-powershell -ExecutionPolicy Bypass -File ./scripts/test-backend.ps1
+## Hızlı başlangıç
+
+Gereksinimler: Docker Compose, Java **21 JDK**, Maven 3.9+, Node 22+, Python 3.12+.
+Depo kökünde:
+
+```bash
+./scripts/setup-dev.sh       # eksik yerel değerleri üretir; mevcut .env korunur
+./scripts/build.sh           # npm ci, frontend production build, Maven verify
+python3 -m venv .venv
+.venv/bin/pip install -r camera/requirements.lock
+./scripts/dev.sh             # altyapı + yerel model servisi + backend
 ```
 
-Backend varsayilan olarak `http://localhost:8080` adresindedir. Parolalar yerel
-`.env` dosyasindan alinir ve Docker imajina dahil edilmez.
+Uygulama ve API aynı origin üzerinde 8080 portunda sunulur. Giriş kullanıcısı
+`operator`; parolası yalnızca yerel, Git'in yok saydığı `.env` içindeki
+`QC_OPERATOR_PASSWORD` değeridir. Kamera adaptörü `camera` kullanıcısını ve ayrı
+`QC_INGEST_PASSWORD` değerini kullanır. Parolaları commit etmeyin veya paylaşmayın.
+`dev.sh` ön planda çalışır; Ctrl+C backend/model süreçlerini kapatır, Docker veri
+volume'lerini korur. Önceden çalışan 8080/9000 servisleri varsa aynı servisi ikinci
+kez başlatmayın.
 
-Şeffaf PET su şişelerinde YOLO ile şişe ve kusur tespiti: `underfill` (düşük dolum), `missing_cap` (kapaksız), `loose_cap` (gevşek kapak).
+Frontend geliştirme için ayrıca `cd frontend && npm run dev`; API istekleri
+backend'e yönlendirilir. HMR yalnızca geliştirme sunucusunda bulunur.
 
-## Dosyalar
-- `visionqc_ron88_train.ipynb`: Colab eğitim not defteri (veri hazırlama, zaman blokları bölmesi, eğitim, değerlendirme).
-- `webcam_test.py`: Eğitilmiş `best.pt` ile bilgisayar kamerasında canlı test.
+Windows'ta `.env` üretmek/güncellemek için `scripts/setup-dev.ps1` kullanılabilir.
+Tam uygulama için `docker compose --profile app up -d --build --wait --wait-timeout 180`.
+Opsiyonel model servisi için ayrıca `-f compose.yaml -f compose.vision.yaml` ekleyin.
 
-## Veri
-Kaggle: `jihadakbr/water-bottle-defect-level-detection-dataset`. Veri bu repoda yok; zip'i kendin indirip Colab'a yükle (`/content/dataset.zip`).
-Havuz: sağlam, düşük dolum, kapaksız, gevşek kapak (1.150 görüntü). Kalan 350 görüntü (yabancı madde, hasarlı etiket, farklı marka) v1'de kullanılmadı.
+## PC kamerası ve gerçek tespit
 
-## Eğitim
-1. Colab'da not defterini aç, GPU seç (A100/L4/T4).
-2. `dataset.zip` dosyasını sol panele yükle.
-3. Çalışma zamanı → Tümünü çalıştır.
+1. Operasyon panelinde **Kamera → Kamerayı aç**. Tarayıcı kamera izni ister.
+2. Model yüklenmemişse önizleme açılır; tespit kapalı kalır.
+3. Güvendiğiniz eğitilmiş ağırlığı yerel diske koyun; model bağımlılıklarını yükleyin:
 
-## Canlı test
+```bash
+.venv/bin/pip install -r camera/requirements-model.txt
+QC_MODEL_PATH=/absolute/path/best.pt .venv/bin/uvicorn camera.server:app --host 127.0.0.1 --port 9000
 ```
-pip install ultralytics opencv-python
-python webcam_test.py --weights best.pt
-```
-Tuşlar: `q` çıkış, `s` kare kaydet. Mac'te kamera izni: Sistem Ayarları → Gizlilik ve Güvenlik → Kamera → Terminal.
-Ağırlık dosyası (`best.pt`) repoda yok; eğitim sonrası Colab'dan indirilir.
 
-## Sınırlar (önemli)
-- v1 test sonuçları (mAP50 0,995; görüntü düzeyinde hatasız) **aynı çekim ortamında** ölçüldü: tek marka, sabit arka plan, aynı gün çekimi.
-- Zaman bloklarına bölme yakın çekim sızıntısını azaltır ama fiziksel şişe bağımsızlığını garanti etmez.
-- Yeni ortama (farklı arka plan, ışık, şişe) genelleme henüz doğrulanmadı; kendi şişelerinle ayrı bir test gerekir.
-- Sonraki adım: farklı arka plan ve ışıkta ikinci bir veri kaynağı, fazla dolum ve eğik/yüksek kapak örnekleri.
+Var olan model servisini önce durdurun. `QC_MODEL_PATH` servis başlatılırken okunur.
+Torch CPU/GPU seçimi ve Ultralytics lisansı için [ürün rehberine](docs/product.md) bakın.
+Tarayıcıda model durumu yenilendikten sonra **Tespiti başlat** etkinleşir.
+HTTPS veya localhost gerekir. Kamera açılınca görüntüler otomatik kaydedilmez;
+yalnızca tespit açıkken JPEG kareler özel model servisine gönderilir.
+
+Alternatif bağımsız adaptör:
+
+```bash
+# QC_INGEST_PASSWORD değerini güvenli yerel ortamdan sağlayın; CLI argümanına yazmayın.
+.venv/bin/python -m camera.run --weights /absolute/path/best.pt --source 0
+```
+
+USB kamera `0`, video dosyası veya RTSP kaynağı desteklenir. İlk akış **tek şişe
+kontrol alanı** içindir: beş gözlemden sonra tek olay; yeni şişe için beş boş gözlem.
+Birden fazla şişede kontrol alanı boşalana kadar kayıt verilmez. Hızlı üretim bandı,
+örtüşen şişeler ve PLC ayırıcı kontrolü henüz saha kabulünden geçmemiştir.
+
+## Doğrulama
+
+```bash
+npm --prefix frontend test
+python3 -m unittest discover -s tests -v
+mvn -B -ntp verify
+python3 scripts/test-product.py              # gerçek çalışan servisler gerekir
+cd frontend && npm run test:e2e              # Chromium; örnek kamera simüle edilir
+```
+
+Yerelde Playwright ayarı `/usr/bin/chromium` kullanır; başka kurulum için
+`CHROMIUM_PATH` verin. CI Playwright'ın kendi Chromium'unu kullanır.
+`test-product.py` yalnızca kendi UUID'leriyle oluşturduğu kayıtları siler.
+Arayüz testleri MANUAL kaynaklı test kayıtları bırakır; kamera KPI'larına karışmaz.
+
+## Mimari ve kapsam
+
+- React/Vite arayüzü build sırasında Spring Boot içine paketlenir.
+- Oturum cookie'si HttpOnly/SameSite=Strict; yazma işlemlerinde CSRF kontrolü vardır.
+- Operatör kayıtları okuyabilir; kamera hesabı yalnızca CAMERA olaylarını gönderebilir.
+- PostgreSQL commit tamamlanmadan olay onaylanmaz. Aynı `eventId` tekrarı kayıt
+  çoğaltmaz; farklı içerikle aynı kimlik HTTP 409 döner.
+- MQTT QoS 1 mesajı commit sonrasında onaylanır. MQTT publisher ACK'i uygulama
+  commit onayı değildir; güvenilir kamera tesliminde HTTP + SQLite outbox kullanılır.
+- Redis eski altyapıyla uyum için korunmuştur; yeni kayıtlar geçici Redis List
+  kuyruğuna yazılmaz. Eski listede bekleyen olay varsa silmeden önce dönüştürülmelidir.
+- Flyway V1–V3 ile mevcut kayıtlar korunur ve `LEGACY` kaynağına ayrılır.
+- Düşük güven / şişe bulunamaması `REVIEW`; PET kusuru `FAIL`; diğerleri `PASS`.
+  PASS, modelin kapsamı dışında kalan kusurlar için güvence değildir.
+
+[Ürün ve üretime geçiş rehberi](docs/product.md) · [API sözleşmesi](docs/api.md) ·
+[Altyapı ayrıntıları](docs/infrastructure.md) · [Araştırma not defteri](visionqc_ron88_train.ipynb)
+
+Mevcut not defterinin aynı çekim ortamında bildirdiği yüksek metrikler, yeni bir
+kamerada veya üretim hattında doğruluk kanıtı değildir. Eğitim verisi ve model
+bu depoda bulunmaz. Veri: `jihadakbr/water-bottle-defect-level-detection-dataset`.
+Fiziksel şişe/çekim oturumu ayrımını zorlayan yeni eğitim girişi `training/train.py`.
