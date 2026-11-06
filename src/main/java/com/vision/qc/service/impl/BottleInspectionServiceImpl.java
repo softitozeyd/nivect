@@ -20,4 +20,8 @@ public class BottleInspectionServiceImpl implements BottleInspectionService {
         return Mono.fromCallable(() -> repository.findTop20ByOverallResultOrderByInspectedAtDesc("FAIL"))
             .subscribeOn(Schedulers.boundedElastic()).flatMapMany(Flux::fromIterable);
     }
+    public Flux<BottleInspection> getRecentInspections() {
+        return Mono.fromCallable(repository::findTop100ByOrderByInspectedAtDescIdDesc)
+            .subscribeOn(Schedulers.boundedElastic()).flatMapMany(Flux::fromIterable);
+    }
 }

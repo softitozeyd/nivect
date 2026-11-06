@@ -6,6 +6,7 @@ services:
     build: .
     restart: unless-stopped
     environment:
+      JAVA_TOOL_OPTIONS: "-Duser.timezone=UTC"
       QC_OPERATOR_PASSWORD: ${QC_OPERATOR_PASSWORD:?Run scripts/setup-dev.sh first}
       QC_INGEST_PASSWORD: ${QC_INGEST_PASSWORD:?Run scripts/setup-dev.sh first}
       QC_SECURE_COOKIE: ${QC_SECURE_COOKIE:-false}

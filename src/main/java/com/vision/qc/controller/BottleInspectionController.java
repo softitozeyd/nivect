@@ -21,6 +21,8 @@ public class BottleInspectionController {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN,"Camera credentials can only submit CAMERA events");
         return service.processInspection(dto);
     }
+    @GetMapping
+    public Flux<BottleInspection> getRecentInspections() {return service.getRecentInspections();}
     @GetMapping("/failures")
     public Flux<BottleInspection> getRecentFailures() {return service.getRecentFailures();}
 }

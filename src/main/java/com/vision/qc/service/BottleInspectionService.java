@@ -8,4 +8,5 @@ import reactor.core.publisher.Mono;
 public interface BottleInspectionService {
     Mono<BottleInspection> processInspection(BottleInspectionDto dto);
     Flux<BottleInspection> getRecentFailures();
+    Flux<BottleInspection> getRecentInspections();
 }

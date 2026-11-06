@@ -1,0 +1,10 @@
+# Optional historical demo, separate from the current app served on 8080.
+# docker compose -f compose.yaml -f compose.frontend.yaml --profile legacy up -d --build legacy-frontend
+services:
+  legacy-frontend:
+    profiles: [legacy]
+    build:
+      context: ./legacy/frontend
+    ports:
+      - "127.0.0.1:5197:80"
+    restart: unless-stopped

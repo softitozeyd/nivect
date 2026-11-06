@@ -102,3 +102,11 @@ Mevcut not defterinin aynı çekim ortamında bildirdiği yüksek metrikler, yen
 kamerada veya üretim hattında doğruluk kanıtı değildir. Eğitim verisi ve model
 bu depoda bulunmaz. Veri: `jihadakbr/water-bottle-defect-level-detection-dataset`.
 Fiziksel şişe/çekim oturumu ayrımını zorlayan yeni eğitim girişi `training/train.py`.
+
+## Birleştirilen önceki frontend
+
+Tüm geliştirme dallarının geçmişi main altında korunur. Güncel Nivect arayüzü
+`frontend/` dizinindedir. Önceki VisionQC demo arayüzü, Türkçe/İngilizce dil
+seçenekleri ve kendi testleriyle [legacy/frontend](legacy/frontend/) altında
+saklanır. Bu ayrı paket güncel frontend build'ine dahil edilmez. Ayrıntılar:
+[birleştirme notu](docs/branch-integration.md).

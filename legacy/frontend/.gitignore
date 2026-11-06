@@ -1,0 +1,15 @@
+node_modules/
+dist/
+.env
+.env.*
+**/.env
+**/.env.*
+*.pem
+*.key
+*.p12
+*.pfx
+.npmrc
+playwright-report/
+test-results/
+*.tsbuildinfo
+*.log

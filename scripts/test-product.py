@@ -60,6 +60,10 @@ def main():
         assert int(real['totals']['total'])==1
         rows=operator.call('/api/v1/records?source=MANUAL&result=REVIEW&line='+line)
         assert rows['total']==2
+        history=operator.call('/api/v1/inspections')
+        assert len(history)<=100
+        assert any(row['eventId']==passed['eventId'] for row in history)
+        status(403,lambda:camera.call('/api/v1/inspections'))
         assert 'MANUAL' in operator.call('/api/v1/export?source=MANUAL&line='+line).decode()
         status(400,lambda:operator.call('/api/v1/records?size=1000'))
         status(400,lambda:operator.call('/api/v1/overview?hours=9999'))

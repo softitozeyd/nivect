@@ -56,6 +56,7 @@ from a timeout; retry that same UUID. HTTP errors never authorize clearing an ou
   is not a heartbeat or a claim that a physical camera is currently online.
 - `GET /api/v1/records?source=CAMERA&hours=24&result=ALL&page=0&size=20`: items,
   total, page, pages. Size 1..100; page nonnegative; hours 1..720.
+- `GET /api/v1/inspections`: latest 100 saved records, newest first, operator only. Uses the current PET DTO metadata contract (including REVIEW); it does not restore the old unauthenticated boolean contract.
 - `GET /api/v1/inspections/failures`: most recent 20 FAIL records, all sources.
 - `GET /api/v1/export`: CSV with the same filters, newest 10,000 rows maximum.
   Values are quoted and spreadsheet formula prefixes are escaped.

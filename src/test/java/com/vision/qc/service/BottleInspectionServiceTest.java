@@ -32,4 +32,13 @@ class BottleInspectionServiceTest {
         StepVerifier.create(service.processInspection(dto)).expectErrorMessage("database offline").verify();
         verify(ledger).record(dto);
     }
+    @Test void exposesBoundedRecentHistoryInRepositoryOrder() {
+        var repo=mock(BottleInspectionRepository.class);
+        var one=BottleInspection.builder().id(2L).build();
+        var two=BottleInspection.builder().id(1L).build();
+        when(repo.findTop100ByOrderByInspectedAtDescIdDesc()).thenReturn(List.of(one,two));
+        var service=new BottleInspectionServiceImpl(mock(InspectionLedger.class),repo);
+        StepVerifier.create(service.getRecentInspections()).expectNext(one,two).verifyComplete();
+        verify(repo).findTop100ByOrderByInspectedAtDescIdDesc();
+    }
 }
