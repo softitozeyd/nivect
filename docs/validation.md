@@ -53,3 +53,26 @@ Paketlenmiş uygulamada 4 Chromium testi geçti: mevcut mobil/kamera/kayıt/CSV
 akışlarına ek olarak referans geçişi, ölçülerin sabit kalması, klavye aktivasyonu,
 filtre kontrastı ve checkbox/range klavye davranışı doğrulandı. Bu revizyon önceki
 satırdaki 3 tarayıcı testi kapsamını 4 teste genişletir.
+
+## Kurumsal README ve ürün turu
+
+README, uygulamanın logosu, açık/koyu logo varyantları, yeşil/adaçayı/krem kapak,
+gerçek ürün ekranları ve video posteriyle yenilendi. Önceki ayrıntılı kurulum
+talimatları [başlangıç rehberinde](getting-started.md) korundu. Turuncu kontrol
+rengi sonraki tema revizyonunda yeşil ve adaçayıyla değiştirildi; videodaki çalışan
+arayüz bu güncel paleti kullanır.
+
+- Ürün turu: **86,06 saniye**, 1920 × 1080, 24 fps, H.264 / AAC; yaklaşık 5 MB.
+- Türkçe ekran açıklamaları, seçilebilir Türkçe altyazı ve 10 bölüm işareti var.
+- FFmpeg, video ve sesin tamamını hatasız çözdü.
+- Chromium'da oynatma ilerledi; 3, 38, 74 ve 83. saniyelere atlama doğrulandı.
+- README ve yeni rehberlerdeki 43 yerel bağlantı/görsel hedefi bulundu; SVG'ler
+  XML olarak ayrıştırıldı. Markdown biçimi ve `git diff --check` geçti.
+- Gerçek uygulamada oturum, kamera önizlemesi, manuel kayıt, filtre, ayrıntı ve
+  CSV akışları kaydedildi. Yalnızca bu tur için oluşturulan üç MANUAL kayıt,
+  kendi kesin olay kimlikleriyle silindi; veritabanı `DELETE 3` bildirdi.
+
+Önizleme, kayıtlı PET videosunun tarayıcı test kamerasına verilmesiyle yapıldı.
+Model dosyası bulunmadığından gerçek çıkarım çalıştırılmadı. Video bu sınırları
+ekranda belirtir; fiziksel kamera veya üretim başarısı iddiası içermez.
+Bu dokümantasyon/medya değişikliği için uygulama test paketleri yeniden çalıştırılmadı.
