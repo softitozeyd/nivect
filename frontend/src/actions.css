@@ -1,8 +1,10 @@
-/* Reference motion: rectangular charcoal label + detached orange circle -> inset square. */
+/* Reference motion: forest label + detached sage circle -> inset square. */
 :root {
-  --action-ink: #171513;
-  --action-orange: #fa7013;
-  --action-white: #fffdf7;
+  --action-surface: var(--green, #2f4935);
+  --action-accent: #b6c69d;
+  --action-on-accent: #263c2b;
+  --action-focus: #637a50;
+  --action-text: var(--cream, #f1f0e6);
   --action-ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
 .action.action {
@@ -23,7 +25,7 @@
   border-radius: 0;
   background: transparent;
   box-shadow: none;
-  color: var(--action-white);
+  color: var(--action-text);
   text-decoration: none;
   text-underline-offset: 0;
   font-size: 12px;
@@ -43,7 +45,7 @@
   position: absolute;
   z-index: -1;
   inset: 0 calc(var(--control-size) + var(--control-gap)) 0 0;
-  background: var(--action-ink);
+  background: var(--action-surface);
   transition: right 0.5s var(--action-ease);
 }
 .action .action-label {
@@ -74,8 +76,8 @@
   margin: 0;
   border: 0;
   border-radius: 50%;
-  background: var(--action-orange);
-  color: var(--action-white);
+  background: var(--action-accent);
+  color: var(--action-on-accent);
   transform-origin: center;
   transition:
     transform 0.5s var(--action-ease),
@@ -98,7 +100,7 @@
   transform: translateX(-6px) scale(0.69);
 }
 .action:focus-visible {
-  outline: 2px solid var(--action-orange);
+  outline: 2px solid var(--action-focus);
   outline-offset: 5px;
 }
 .action:disabled {
@@ -161,7 +163,7 @@
   gap: 12px;
 }
 .site-nav nav a {
-  color: var(--action-white);
+  color: var(--action-text);
 }
 .hero .action.pill {
   --control-size: 48px;
@@ -191,7 +193,7 @@
   gap: var(--control-gap);
   padding: 0;
   border-radius: 0;
-  color: var(--action-white);
+  color: var(--action-text);
 }
 .action.motion-toggle .action-label {
   padding: 8px 12px;
@@ -245,14 +247,14 @@
   --control-size: 32px;
   font-size: 9px;
   gap: var(--control-gap);
-  color: var(--action-white);
+  color: var(--action-text);
 }
 .footer > .action .action-label {
   padding: 8px 12px;
 }
 .feature-icon {
-  background: var(--action-orange);
-  color: white;
+  background: var(--action-accent);
+  color: var(--action-on-accent);
   border: 0;
   transition:
     transform 0.5s var(--action-ease),
@@ -285,7 +287,7 @@
   width: 100%;
   margin: 0 0 5px;
   padding: 0;
-  color: var(--action-white);
+  color: var(--action-text);
   background: transparent;
   border-radius: 0;
   font-size: 10px;
@@ -321,7 +323,7 @@
   width: 100%;
   margin: 8px 0;
   padding: 0;
-  color: var(--action-white);
+  color: var(--action-text);
   background: transparent;
 }
 .sidebar-bottom > .action .action-label {
@@ -347,7 +349,7 @@
   --control-size: 32px;
   flex-shrink: 0;
   margin-left: auto;
-  color: var(--action-white);
+  color: var(--action-text);
   font-size: 10px;
 }
 .model-banner .action-label {
@@ -401,7 +403,7 @@
   max-width: 100%;
   min-width: 0;
   min-height: var(--control-size);
-  color: var(--action-white);
+  color: var(--action-text);
   font-size: 10px;
 }
 .select-control::before {
@@ -409,7 +411,7 @@
   position: absolute;
   z-index: -1;
   inset: 0 calc(var(--control-size) + var(--control-gap)) 0 0;
-  background: var(--action-ink);
+  background: var(--action-surface);
   transition: right 0.5s var(--action-ease);
 }
 .select-control > select {
@@ -431,8 +433,8 @@
   cursor: pointer;
 }
 .select-control option {
-  color: var(--action-white);
-  background: var(--action-ink);
+  color: var(--action-text);
+  background: var(--action-surface);
 }
 .select-orb {
   position: absolute;
@@ -443,8 +445,8 @@
   place-items: center;
   width: var(--control-size);
   height: var(--control-size);
-  background: var(--action-orange);
-  color: var(--action-white);
+  background: var(--action-accent);
+  color: var(--action-on-accent);
   border-radius: 50%;
   pointer-events: none;
   transform: translateY(-50%);
@@ -460,7 +462,7 @@
   transform: translate(-5px, -50%) scale(0.76);
 }
 .select-control:focus-within {
-  outline: 2px solid var(--action-orange);
+  outline: 2px solid var(--action-focus);
   outline-offset: 4px;
 }
 .select-control > select:focus-visible {
@@ -489,16 +491,16 @@ input:not([type="checkbox"]):not([type="range"]) {
     box-shadow 0.25s;
 }
 input:not([type="checkbox"]):not([type="range"]):is(:hover, :focus) {
-  border-color: #fa7013;
+  border-color: var(--action-focus);
 }
 input:focus-visible {
-  outline: 2px solid var(--action-orange);
+  outline: 2px solid var(--action-focus);
   outline-offset: 3px;
 }
 input[type="checkbox"],
 .checkbox-label input,
 .form-stack input[type="range"] {
-  accent-color: var(--action-orange);
+  accent-color: var(--action-accent);
 }
 .action[aria-pressed="true"]::before {
   right: 0;
@@ -670,10 +672,10 @@ input[type="checkbox"],
 }
 /* Guard control internals against contextual heading/sidebar text rules. */
 .sidebar nav .action.selected {
-  color: var(--action-white);
+  color: var(--action-text);
 }
 .select-control.select-control {
-  color: var(--action-white);
+  color: var(--action-text);
   margin: 0;
   font-size: 11px;
   letter-spacing: 0;
@@ -683,14 +685,14 @@ input[type="checkbox"],
   place-items: center;
   margin: 0;
   padding: 0;
-  color: var(--action-white);
+  color: var(--action-on-accent);
   font-size: inherit;
 }
 .select-control > .select-orb > svg {
   display: block;
   position: static;
   margin: 0;
-  color: var(--action-white);
+  color: var(--action-on-accent);
   width: 15px;
   height: 15px;
 }
@@ -785,7 +787,7 @@ input[type="checkbox"],
   min-height: 34px;
   margin: 0;
   padding: 0 0 0 13px;
-  color: var(--action-white);
+  color: var(--action-text);
   font-size: 11px;
   cursor: pointer;
 }
@@ -794,7 +796,7 @@ input[type="checkbox"],
   position: absolute;
   z-index: -1;
   inset: 0 calc(var(--check-size) + 7px) 0 0;
-  background: var(--action-ink);
+  background: var(--action-surface);
   transition: right 0.5s var(--action-ease);
 }
 .form-stack .checkbox-label input[type="checkbox"] {
@@ -812,8 +814,8 @@ input[type="checkbox"],
   padding: 0;
   border: 0;
   border-radius: 50%;
-  background: var(--action-orange);
-  color: var(--action-white);
+  background: var(--action-accent);
+  color: var(--action-on-accent);
   cursor: pointer;
   transition:
     transform 0.5s var(--action-ease),
@@ -826,7 +828,7 @@ input[type="checkbox"],
   font-size: 19px;
   line-height: 1;
   display: block;
-  color: var(--action-white);
+  color: var(--action-on-accent);
 }
 .form-stack .checkbox-label input[type="checkbox"]:checked::after {
   content: "✓";
@@ -857,7 +859,7 @@ input[type="checkbox"],
 .form-stack input[type="range"]::-webkit-slider-runnable-track {
   height: 4px;
   border-radius: 0;
-  background: var(--action-ink);
+  background: var(--action-surface);
 }
 .form-stack input[type="range"]::-webkit-slider-thumb {
   appearance: none;
@@ -867,7 +869,7 @@ input[type="checkbox"],
   margin-top: -8px;
   border: 0;
   border-radius: 50%;
-  background: var(--action-orange);
+  background: var(--action-accent);
   transition:
     border-radius 0.35s var(--action-ease),
     transform 0.35s var(--action-ease);
@@ -880,14 +882,14 @@ input[type="checkbox"],
 .form-stack input[type="range"]::-moz-range-track {
   height: 4px;
   border-radius: 0;
-  background: var(--action-ink);
+  background: var(--action-surface);
 }
 .form-stack input[type="range"]::-moz-range-thumb {
   width: 20px;
   height: 20px;
   border: 0;
   border-radius: 50%;
-  background: var(--action-orange);
+  background: var(--action-accent);
   transition:
     border-radius 0.35s var(--action-ease),
     transform 0.35s var(--action-ease);
@@ -911,10 +913,15 @@ input[type="checkbox"],
 .action.action:hover,
 .action.action:focus-visible {
   background: transparent;
-  color: var(--action-white);
+  color: var(--action-text);
   box-shadow: none;
   transform: none;
 }
 .footer > a.action {
-  color: var(--action-white);
+  color: var(--action-text);
+}
+
+/* The dark hero needs a light focus ring; controls elsewhere use olive. */
+.hero .action {
+  --action-focus: var(--action-accent);
 }

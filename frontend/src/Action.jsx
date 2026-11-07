@@ -46,7 +46,7 @@ export default function Action({
   );
 }
 
-/** Native select semantics, matching the same detached orange control. */
+/** Native select semantics, matching the same detached theme accent control. */
 export function SelectControl({
   className = "",
   children,

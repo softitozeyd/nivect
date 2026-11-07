@@ -159,7 +159,8 @@ test("reference controls morph without layout shifts and preserve native semanti
     exact: true,
   });
   const orb = action.locator(".action-orb");
-  await expect(orb).toHaveCSS("background-color", "rgb(250, 112, 19)");
+  await expect(orb).toHaveCSS("background-color", "rgb(182, 198, 157)");
+  await expect(orb).toHaveCSS("color", "rgb(38, 60, 43)");
   await expect(orb).toHaveCSS("border-radius", "50%");
   const before = await action.boundingBox();
   await action.hover();
@@ -193,16 +194,16 @@ test("reference controls morph without layout shifts and preserve native semanti
   await expect(page.getByLabel("Kayıt kaynağı")).toHaveValue("MANUAL");
   await expect(page.getByLabel("Sonuç filtresi")).toHaveCSS(
     "color",
-    "rgb(255, 253, 247)",
+    "rgb(241, 240, 230)",
   );
   await expect(page.locator(".sidebar .selected .action-label")).toHaveCSS(
     "color",
-    "rgb(255, 253, 247)",
+    "rgb(241, 240, 230)",
   );
   await page.getByRole("button", { name: "Manuel test", exact: true }).click();
   await expect(page.getByLabel("Düşük dolum", { exact: true })).toHaveCSS(
     "accent-color",
-    "rgb(250, 112, 19)",
+    "rgb(182, 198, 157)",
   );
   const checkbox = page.getByLabel("Düşük dolum", { exact: true });
   await checkbox.check();
