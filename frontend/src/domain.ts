@@ -11,6 +11,7 @@ export const categories = [
   "Label defect",
   "Fill level defect",
   "Multiple defects",
+  "Uncertain",
 ] as const;
 export const reviewSchema = z.object({
   outcome: z.enum(["confirmed", "false-positive", "flagged"]),
@@ -20,6 +21,8 @@ export const reviewSchema = z.object({
 export const eventSchema = z.object({
   id: z.string(),
   timestamp: z.string().datetime(),
+  sessionId: z.number().int().positive().optional(),
+  productNumber: z.number().int().positive().optional(),
   stationId: z.string(),
   lineId: z.string(),
   product: z.string(),

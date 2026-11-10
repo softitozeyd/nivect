@@ -97,3 +97,15 @@ body { background: #eef2ee; color: #1b302c; }
 
 .overview-shortcut { display: inline-flex; align-items: center; gap: 8px; min-height: 39px; padding: 10px 14px; color: #fff; background: #126e67; border-radius: 9px; font-size: 12px; font-weight: 700; white-space: nowrap; }
 .overview-shortcut:hover { background: #0b5851; color: #fff; }
+
+.production-counters, .production-overview { border-top: 1px solid #e8efea; padding: 20px 26px; }
+.cloud-shell .production-overview { margin-bottom: 18px; padding: 20px 24px; }
+.production-counters-heading { display:flex; justify-content:space-between; align-items:center; gap:10px; color:#264238; font-size:14px; }
+.production-counters-heading span { color:#668275; font-size:12px; }
+.production-counter-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; margin-top:14px; }
+.production-counter-grid > div { padding:12px; background:#f4f8f5; border:1px solid #e5eee7; border-radius:9px; }
+.production-counter-grid small { font-size:11px; color:#647a6e; }
+.production-counter-grid strong { display:block; margin-top:5px; color:#234237; font-size:21px; }
+.cloud-shell .production-counters p, .cloud-shell .production-overview p { color:#71877b; margin:12px 0 0; font-size:12px; }
+.session-open-note { display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-top:12px; color:#876328; font-size:12px; }
+@media(max-width:600px) { .production-counter-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .production-counters { padding:18px; } }

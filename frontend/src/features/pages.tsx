@@ -35,6 +35,18 @@ import {
 import { EventTable, EventDetail, ExportButton } from "../components/events";
 import { petProduct } from "../services/nivect";
 import { CameraPanel } from "../components/camera";
+import { useProductionSession } from "../services/production";
+function ProductionSummary() {
+  const {language} = useLanguage();
+  const tr = language === "tr";
+  const {production, sessionError} = useProductionSession();
+  const rejected = production ? production.defectCount + production.uncertainCount : 0;
+  return <section className="production-overview panel">
+    <div className="production-counters-heading"><strong>{tr ? "Kamera test oturumu" : "Camera test session"}{production ? ` #${production.id}` : ""}</strong><span>{sessionError ? (tr ? "Bağlantı hatası" : "Connection error") : production?.active ? (tr ? "Oturum açık" : "Session open") : production ? (tr ? "Son oturum" : "Last session") : (tr ? "Henüz oturum yok" : "No session yet")}</span></div>
+    <div className="production-counter-grid"><div><small>{tr ? "Toplam sayılan" : "Total counted"}</small><strong>{production?.totalCount ?? "—"}</strong></div><div><small>{tr ? "Uygun" : "Pass"}</small><strong>{production?.passCount ?? "—"}</strong></div><div><small>{tr ? "Ayrılacak (kararsız dahil)" : "To reject (incl. uncertain)"}</small><strong>{production ? rejected : "—"}</strong></div><div><small>{tr ? "Ayrılacak oranı" : "Rejection rate"}</small><strong>{production?.totalCount ? `${(100 * rejected / production.totalCount).toFixed(1)}%` : "—"}</strong></div></div>
+    <p>{tr ? "Yalnızca yerel kamera testindeki sayım; fiziksel ayırma yapılmaz ve kesin bant sayımı değildir." : "Local camera trial counts only; no physical rejection and not an accurate conveyor count."}</p>
+  </section>;
+}
 function MetricRow({ events, useAllRecords = false }: { events: InspectionEvent[]; useAllRecords?: boolean }) {
   const t = useT();
   const { language } = useLanguage();
@@ -149,6 +161,7 @@ export function Overview() {
     .reduce((n, s) => n + s.fps, 0);
   return (
     <>
+      {mode === "api" && <ProductionSummary />}
       <div className="context-strip">
         <div>
           <span className={healthy ? "pulse-dot" : "warning-dot"} />

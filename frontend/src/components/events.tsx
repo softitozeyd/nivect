@@ -88,6 +88,7 @@ export function EventTable({
                     >
                       {e.id}
                     </button>
+                    {e.productNumber && <small>{t("Product number")}: #{e.productNumber}</small>}
                     <small>{formatDate(e.timestamp, preferences.zone, language === "tr" ? "tr-TR" : "en-US")}</small>
                     {recommendations && (
                       <small className="product-caption">{e.product}</small>
@@ -333,6 +334,7 @@ export function EventDetail({
               ]
             : []),
           ["Product", t(event.product)],
+          ...(event.sessionId ? [["Production session", `#${event.sessionId}`], ["Product number", `#${event.productNumber}`]] : []),
           ["Line / Station", `${t(event.lineId)} / ${t(event.stationId)}`],
           [
             mode === "demo" ? "AI prediction" : "Backend quality decision",

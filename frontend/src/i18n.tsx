@@ -3,6 +3,8 @@ import type { ReactNode } from "react";
 
 export type Language = "tr" | "en";
 const turkish: Record<string, string> = {
+  "Production session": "Üretim oturumu", "Product number": "Ürün sıra numarası",
+  "Uncertain": "Kararsız",
   "Open camera": "Kamerayı aç",
   "Monitoring and decision support only. No physical production controls.": "Yalnızca izleme ve karar desteği sağlar. Fiziksel üretimi kontrol etmez.",
   "Showing the latest 100 inspection records.": "Son 100 inceleme kaydı gösteriliyor.",

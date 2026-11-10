@@ -61,16 +61,18 @@ export const historySchema = z.array(inspectionSchema).max(100)
 export type NivectInspection = z.infer<typeof inspectionSchema>;
 const modelDetectionSchema = z.object({
   id: z.number().int().positive().max(Number.MAX_SAFE_INTEGER),
-  defects: z.string().min(1).refine(value => value.split(",").every(name => ["underfill", "missing_cap", "loose_cap"].includes(name))),
+  defects: z.string().min(1).refine(value => value.split(",").every(name => ["underfill", "missing_cap", "loose_cap", "uncertain"].includes(name))),
   recordedAt: z.string().datetime({offset: true}),
+  sessionId: z.number().int().positive().nullish(), productNumber: z.number().int().positive().nullish(),
+  modelDecision: z.enum(["FAIL", "REVIEW"]).nullish(),
 });
 export const modelDetectionsSchema = z.array(modelDetectionSchema).max(100)
   .refine(rows => new Set(rows.map(row => row.id)).size === rows.length, "Duplicate detection ID");
 export function toModelEvent(row: z.infer<typeof modelDetectionSchema>): InspectionEvent {
-  const names: Record<string, DefectCategory> = { underfill: "Underfill", missing_cap: "Missing cap", loose_cap: "Loose cap" };
+  const names: Record<string, DefectCategory> = { underfill: "Underfill", missing_cap: "Missing cap", loose_cap: "Loose cap", uncertain: "Uncertain" };
   const defects = row.defects.split(",").map(name => names[name]);
   return {
-    id: `MD-${row.id}`, timestamp: row.recordedAt, lineId: "Local camera", stationId: "Local camera",
+    id: `MD-${row.id}`, timestamp: row.recordedAt, sessionId: row.sessionId ?? undefined, productNumber: row.productNumber ?? undefined, lineId: "Local camera", stationId: "Local camera",
     product: "PET bottle", category: defects.length > 1 ? "Multiple defects" : defects[0], defects,
     decision: "reject", confidence: null, modelVersion: "Unavailable", imageUrl: null, imagePath: null,
   };
