@@ -3,6 +3,8 @@ import type { ReactNode } from "react";
 
 export type Language = "tr" | "en";
 const turkish: Record<string, string> = {
+  "Backend camera status unavailable": "Backend kamera durumu sunmuyor",
+  "Use your local camera and view model predictions.": "Yerel kameranızı açın ve model tahminlerini görüntüleyin.",
   "Nivect / Spring Boot · Latest 100 inspections": "Nivect / Spring Boot · Son 100 inceleme",
   "History shows the latest 100 saved records. Total production, FPS, camera health, model confidence and image access are unavailable. Assumed backend UTC offset:": "Geçmişte kaydedilmiş son 100 inceleme gösterilir. Toplam üretim, FPS, kamera durumu, model güveni ve görüntüler sunulmuyor. Uygulanan sunucu saat farkı:",
   "Find and inspect recent inspection records.": "Son inceleme kayıtlarını bulun ve inceleyin.",

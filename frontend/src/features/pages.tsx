@@ -34,6 +34,7 @@ import {
 } from "../components/ui";
 import { EventTable, EventDetail, ExportButton } from "../components/events";
 import { petProduct } from "../services/nivect";
+import { CameraPanel } from "../components/camera";
 function MetricRow({ events }: { events: InspectionEvent[] }) {
   const t = useT();
   const { language } = useLanguage();
@@ -502,6 +503,7 @@ export function Monitoring() {
   }
   return (
     <>
+      {mode === "api" && <CameraPanel />}
       <div className="section-top">
         <label>
           {failuresOnly ? t("Select line") : t("Select station")}
@@ -573,7 +575,7 @@ export function Monitoring() {
                   ? t("Disconnected")
                   : paused
                     ? t("View paused")
-                    : t("Camera feed unavailable")
+                    : t("Backend camera status unavailable")
                 : health !== "active"
                   ? t(statusLabels[health])
                   : paused

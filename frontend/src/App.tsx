@@ -183,7 +183,7 @@ export default function App() {
               <h1>{t(current?.label || "Page not found")}</h1>
               <p>
                 {mode === "api" && location.pathname === "/monitoring"
-                  ? t("View the latest available failure record.")
+                  ? t("Use your local camera and view model predictions.")
                   : mode === "api" && location.pathname === "/history"
                     ? t("Find and inspect recent inspection records.")
                     : t(descriptions[location.pathname] || "")}
