@@ -343,7 +343,7 @@ export function Overview() {
               <div>
                 <strong>
                   {failuresOnly
-                    ? backendStatus
+                    ? t(backendStatus)
                     : offline || error
                       ? "—"
                       : totalFps}
@@ -399,7 +399,7 @@ export function Overview() {
                 <strong>
                   {[...new Set(stations.map((s) => s.modelVersion))].join(
                     ", ",
-                  ) || "Unknown"}
+                  ) || t("Unknown")}
                 </strong>
               </span>
               <span className="soft-label">
@@ -540,12 +540,12 @@ export function Monitoring() {
             ))}
           </select>
         </label>
-        <button onClick={toggle} disabled={!event}>
+        {mode === "demo" && <button onClick={toggle} disabled={!event}>
           {paused ? <Play size={16} /> : <Pause size={16} />}{" "}
           {paused ? t("Resume view") : t("Pause view")}
-        </button>
+        </button>}
       </div>
-      <div className="monitor-grid">
+      {mode === "demo" && <div className="monitor-grid">
         <section className="panel">
           <div className="panel-heading">
             <h2>
@@ -634,7 +634,7 @@ export function Monitoring() {
             </button>
           )}
         </section>
-      </div>
+      </div>}
       <section className="panel">
         <div className="panel-heading">
           <h2>

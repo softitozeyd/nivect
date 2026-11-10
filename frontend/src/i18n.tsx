@@ -3,6 +3,11 @@ import type { ReactNode } from "react";
 
 export type Language = "tr" | "en";
 const turkish: Record<string, string> = {
+  "Open camera": "Kamerayı aç",
+  "Monitoring and decision support only. No physical production controls.": "Yalnızca izleme ve karar desteği sağlar. Fiziksel üretimi kontrol etmez.",
+  "Showing the latest 100 inspection records.": "Son 100 inceleme kaydı gösteriliyor.",
+  "Showing recorded failures; total production is unavailable.": "Kaydedilen hatalar gösteriliyor; toplam üretim bilgisi bulunmuyor.",
+  "About this data": "Veri kapsamı",
   "Local model service": "Yerel model servisi", "Model service ready": "Model servisi hazır", "Checking model service": "Model servisi kontrol ediliyor", "Model service unavailable": "Model servisine erişilemiyor", "Inference device": "Model işlemcisi",
   "The camera opens only on the live monitoring page. This status does not verify camera hardware.": "Kamera yalnızca canlı izleme sayfasında açılır. Bu durum kamera donanımının çalıştığını doğrulamaz.",
  "Recent failure records awaiting review: {count}.": "İncelenmeyi bekleyen son hatalı kayıt sayısı: {count}.",

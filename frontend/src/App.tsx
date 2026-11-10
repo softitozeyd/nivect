@@ -190,6 +190,7 @@ export default function App() {
               </p>
             </div>
             <div className="heading-actions">
+              {location.pathname === "/" && <Link className="overview-shortcut" to="/monitoring"><Camera size={15}/>{t("Open camera")}</Link>}
               <span className="line-button" title={t("MVP: one production line")}>
                 <Camera size={14} />{" "}
                 {mode === "demo" ? t("Production Line 01") : t("Nivect · All lines")}{" "}
@@ -235,8 +236,8 @@ export default function App() {
               <Activity size={16} />
               <div>
                 <strong>{t(location.pathname === "/history" ? "Nivect / Spring Boot · Latest 100 inspections" : "Nivect / Spring Boot · Recent recorded failures")}</strong>
-                <p>{t(location.pathname === "/history" ? "History shows the latest 100 saved records. Total production, FPS, camera health, model confidence and image access are unavailable. Assumed backend UTC offset:" : "The overview and reports show recent failure records, including local camera detections. They do not represent total production or a defect rate. FPS, station health, and saved images are unavailable. Assumed backend UTC offset:")}{" "}
-                  {backendOffset}{' '}{t("(the API provides no time zone).")}{' '}</p>
+                <p>{t(location.pathname === "/history" ? "Showing the latest 100 inspection records." : "Showing recorded failures; total production is unavailable.")}</p>
+                <details className="scope-details"><summary>{t("About this data")}</summary><p>{t(location.pathname === "/history" ? "History shows the latest 100 saved records. Total production, FPS, camera health, model confidence and image access are unavailable. Assumed backend UTC offset:" : "The overview and reports show recent failure records, including local camera detections. They do not represent total production or a defect rate. FPS, station health, and saved images are unavailable. Assumed backend UTC offset:")}{" "}{backendOffset}{' '}{t("(the API provides no time zone).")}</p></details>
               </div>
             </div>
           )}

@@ -18,6 +18,7 @@ import { LanguageProvider } from "./i18n";
 import { Provider } from "./store";
 import "./styles.css";
 import "./styles/refresh.css";
+import "./styles/industrial.css";
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <LanguageProvider><BrowserRouter>

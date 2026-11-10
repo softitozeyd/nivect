@@ -1,0 +1,99 @@
+/* Operator interface: readable surfaces and clear action hierarchy. */
+:root { --teal: #126e67; --navy: #182a2c; --border: #dce5e0; --shadow: 0 8px 28px #213c3210; }
+body { background: #eef2ee; color: #1b302c; }
+.cloud-shell { background: linear-gradient(180deg, #e6ede8 0, #f2f5f1 340px); }
+.cloud-shell .topbar { max-width: 1600px; height: 82px; }
+.cloud-shell .brand { color: #172e29; font-size: 21px; letter-spacing: -.7px; }
+.cloud-shell .brand-mark { background: #126e67; box-shadow: none; border-radius: 10px; }
+.top-navigation { background: #fff; border: 1px solid #d9e4dd; box-shadow: 0 4px 14px #304d3e0a; border-radius: 13px; padding: 5px; gap: 2px; }
+.top-navigation a { color: #536b62; border-radius: 9px; font-size: 12px; padding: 10px 13px; }
+.top-navigation a.active, .top-navigation a.active:hover { background: #1d3e35; color: #fff; box-shadow: none; }
+.top-navigation a:hover { background: #edf5f0; color: #213d34; }
+.cloud-shell .topbar-right .icon-button { background: #fff; color: #4d685f; border-color: #dce6df; }
+.cloud-shell .demo-mode { background: #e0efe8; border-color: #cbe0d3; color: #316655; font-size: 10px; font-weight: 700; }
+.cloud-shell main { max-width: 1600px; padding-top: 18px; }
+.cloud-shell .page-heading { align-items: center; margin-bottom: 18px; }
+.cloud-shell .page-heading .eyebrow { color: #648278; font-size: 10px; letter-spacing: 1.2px; }
+.cloud-shell h1 { color: #18352e; font-size: 30px; letter-spacing: -1px; }
+.cloud-shell .page-heading p { color: #5d746b; font-size: 14px; }
+.cloud-shell .panel { background: #fff; border: 1px solid #dce6df; border-radius: 16px; box-shadow: 0 6px 24px #2944390a; }
+.cloud-shell .panel-heading h2, .cloud-shell .panel h2 { color: #203b33; }
+.cloud-shell .panel-heading p, .cloud-shell .panel p { line-height: 1.55; }
+.cloud-shell .metric { background: #fff; border: 1px solid #dce6df; border-radius: 15px; }
+.cloud-shell .metric .eyebrow { font-size: 11px; color: #647b71; }
+.cloud-shell .metric-value { color: #18352e; }
+.cloud-shell .primary { background: #126e67; border-color: #126e67; color: #fff; }
+.cloud-shell .primary:hover { background: #0b5851; border-color: #0b5851; }
+.cloud-shell button, .cloud-shell select, .cloud-shell input { font-size: 13px; }
+.cloud-shell .table-scroll th { font-size: 11px; letter-spacing: .05em; }
+.cloud-shell .table-scroll td { font-size: 13px; }
+.cloud-shell .freshness { font-size: 11px; color: #647a70; margin-bottom: 14px; }
+.cloud-shell .api-scope-banner { background: #f5f9f5; border-color: #dce8de; color: #466254; padding: 11px 15px; }
+.cloud-shell .api-scope-banner p { font-size: 12px; color: #5f756b; }
+.cloud-shell .camera-panel { padding: 0; overflow: hidden; margin-bottom: 24px; }
+.camera-panel-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding: 24px 26px 20px; border-bottom: 1px solid #e8efea; }
+.camera-heading { display: flex; gap: 13px; align-items: flex-start; }
+.camera-heading-icon { flex: none; display: grid; place-items: center; width: 42px; height: 42px; color: #126e67; background: #e3f2e9; border: 1px solid #cee7d8; border-radius: 11px; }
+.camera-kicker { display: block; color: #648277; font-size: 10px; font-weight: 800; letter-spacing: 1px; margin: 0 0 5px; }
+.cloud-shell .camera-heading h2 { font-size: 18px; line-height: 1.2; }
+.cloud-shell .camera-heading p { font-size: 13px; color: #73887e; margin: 5px 0 0; }
+.camera-state, .record-indicator { display: inline-flex; align-items: center; gap: 7px; white-space: nowrap; font-size: 12px; font-weight: 700; color: #71837b; }
+.camera-state { padding: 7px 10px; border: 1px solid #e0e8e2; background: #f6f8f6; border-radius: 8px; }
+.camera-state span, .record-indicator span, .camera-live-label span { width: 7px; height: 7px; flex: none; border-radius: 50%; background: #9aa9a1; }
+.camera-state.online { color: #216b4e; background: #e8f6ed; border-color: #cdebd8; }
+.camera-state.online span { background: #22a46f; }
+.camera-workspace { display: grid; grid-template-columns: minmax(0, 1fr) minmax(260px, 340px); gap: 24px; padding: 24px 26px 26px; }
+.camera-main { min-width: 0; }
+.camera-view { width: 100%; max-width: none; height: clamp(240px, 30vw, 430px); min-height: 240px; background: #152824; border-radius: 12px; overflow: hidden; }
+.camera-view video { height: 100%; max-height: none; object-fit: contain; }
+.camera-placeholder { position: absolute; display: grid; justify-items: center; text-align: center; color: #d8e6dd; gap: 8px; }
+.camera-placeholder > span { width: 52px; height: 52px; display: grid; place-items: center; border: 1px solid #ffffff32; border-radius: 15px; color: #aec6b8; background: #ffffff0b; }
+.camera-placeholder strong { font-size: 14px; color: #e5eee8; }
+.cloud-shell .camera-placeholder p { margin: 0; color: #97b0a1; font-size: 12px; }
+.camera-live-label { position: absolute; top: 14px; left: 14px; display: inline-flex; align-items: center; gap: 7px; padding: 7px 9px; border-radius: 6px; background: #10251fd9; color: #fff; font-size: 10px; font-weight: 800; letter-spacing: .6px; }
+.camera-live-label span { background: #53d995; }
+.camera-actions { margin: 16px 0 0; gap: 9px; }
+.camera-actions button { min-height: 42px; padding: 10px 16px; border-radius: 9px; font-weight: 700; }
+.camera-actions .camera-record { color: #2a453c; border-color: #cbdad0; background: #fff; }
+.camera-actions .camera-record:not(:disabled):hover { background: #f1f7f3; }
+.camera-actions .camera-record.is-recording { color: #a53132; border-color: #e7bcbc; background: #fff7f6; }
+.record-indicator { margin-left: auto; font-size: 12px; }
+.record-indicator.is-recording { color: #a73333; }
+.record-indicator.is-recording span { background: #df4a49; }
+.cloud-shell .camera-hint { color: #768a7f; font-size: 12px; margin: 10px 0 0; }
+.camera-sidebar { border: 1px solid #e4ece6; border-radius: 12px; background: #f8faf8; padding: 18px; }
+.camera-result-label { color: #70887a; display: flex; justify-content: space-between; align-items: center; font-size: 10px; font-weight: 800; letter-spacing: .8px; }
+.camera-result { display: flex; align-items: flex-start; gap: 10px; padding: 18px 0 4px; }
+.camera-result-icon { display: grid; place-items: center; flex: none; width: 40px; height: 40px; color: #71877a; background: #e8efea; border-radius: 10px; }
+.camera-result.fail .camera-result-icon { color: #b74036; background: #fbeae6; }
+.camera-result.pass .camera-result-icon { color: #27865d; background: #e3f3e8; }
+.camera-result strong { color: #253e35; font-size: 14px; }
+.cloud-shell .camera-result p { color: #74897e; font-size: 12px; margin: 5px 0 0; }
+.camera-divider { height: 1px; background: #e1ebe3; margin: 20px 0; }
+.camera-steps h3 { color: #29463b; font-size: 13px; margin: 0 0 13px; }
+.camera-steps > div { display: flex; gap: 10px; align-items: flex-start; margin: 11px 0; }
+.camera-steps > div > span { flex: none; display: grid; place-items: center; width: 20px; height: 20px; border: 1px solid #c9dbce; border-radius: 50%; color: #497061; font-size: 10px; font-weight: 800; }
+.cloud-shell .camera-steps p { font-size: 12px; color: #61786c; margin: 1px 0 0; }
+.cloud-shell .camera-disclaimer { border-radius: 8px; background: #edf4ef; color: #6a8273; padding: 10px 11px; margin: 18px 0 0; font-size: 11px; }
+.camera-recent { border-top: 1px solid #e8efea; display: flex; justify-content: space-between; gap: 14px; align-items: center; padding: 19px 26px 10px; }
+.camera-recent h3 { color: #264238; font-size: 14px; margin: 0; }
+.cloud-shell .camera-recent p { color: #84978b; font-size: 12px; margin: 4px 0 0; }
+.camera-recent a { display: inline-flex; align-items: center; gap: 8px; color: #177467; font-size: 12px; font-weight: 700; }
+.camera-recent-list { padding: 0 26px 16px; }
+.camera-recent-list > div { display: flex; align-items: center; gap: 10px; padding: 11px 0; border-bottom: 1px solid #edf2ee; font-size: 12px; }
+.camera-recent-list > div:last-child { border-bottom: 0; }
+.camera-recent-list strong { color: #324e42; }
+.camera-recent-list time { margin-left: auto; color: #819487; white-space: nowrap; }
+.camera-recent-dot { width: 7px; height: 7px; border-radius: 50%; background: #db7961; }
+.cloud-shell .camera-recent-empty { margin: 0; padding: 6px 26px 22px; color: #84978b; font-size: 12px; }
+@media (max-width: 1120px) { .cloud-shell .topbar { height: 122px; } .top-navigation a { font-size: 12px; } }
+@media (max-width: 760px) { .camera-workspace { grid-template-columns: 1fr; padding: 18px; gap: 16px; } .camera-panel-header { padding: 19px 18px; } .camera-view { height: 300px; } .camera-sidebar { padding: 16px; } .camera-recent { padding: 17px 18px 10px; } .camera-recent-list { padding-inline: 18px; } .cloud-shell .camera-recent-empty { padding-inline: 18px; } }
+@media (max-width: 480px) { .camera-view { height: 230px; min-height: 230px; } .camera-actions button { flex: 1 1 auto; } .record-indicator { width: 100%; margin: 3px 0 0; } .camera-heading h2 { font-size: 16px; } .camera-state { font-size: 11px; } .camera-recent-list > div { align-items: flex-start; flex-wrap: wrap; } }
+.camera-view .camera-placeholder p { position: static; }
+
+.scope-details { margin-top: 5px; }
+.scope-details summary { cursor: pointer; color: #126e67; font-size: 12px; font-weight: 700; }
+.scope-details p { max-width: 1000px; margin: 8px 0 0; }
+
+.overview-shortcut { display: inline-flex; align-items: center; gap: 8px; min-height: 39px; padding: 10px 14px; color: #fff; background: #126e67; border-radius: 9px; font-size: 12px; font-weight: 700; white-space: nowrap; }
+.overview-shortcut:hover { background: #0b5851; color: #fff; }
