@@ -1,5 +1,5 @@
 import { useLanguage, useT } from '../i18n';
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import {
   ArrowUpRight,
@@ -35,7 +35,7 @@ import {
 import { EventTable, EventDetail, ExportButton } from "../components/events";
 import { petProduct } from "../services/nivect";
 import { CameraPanel } from "../components/camera";
-function MetricRow({ events }: { events: InspectionEvent[] }) {
+function MetricRow({ events, useAllRecords = false }: { events: InspectionEvent[]; useAllRecords?: boolean }) {
   const t = useT();
   const { language } = useLanguage();
   const { snapshot, offline, error, mode, now, failuresOnly } = useApp();
@@ -64,10 +64,10 @@ function MetricRow({ events }: { events: InspectionEvent[] }) {
       />
       <MetricCard
         label={failuresOnly ? t("FAILURE RECORDS RECEIVED") : t("DEFECTIVE PRODUCTS")}
-        value={String(m.defective)}
+        value={String(failuresOnly && useAllRecords && snapshot?.summary ? snapshot.summary.legacyFailureRecords + snapshot.summary.cameraDetectionRecords : m.defective)}
         unit={t("units")}
         detail={
-          failuresOnly ? t("Within the latest 20 FAIL records") : t("Flagged by AI")
+          failuresOnly ? (useAllRecords ? t("All saved failure records; not a production count") : t("Recent failure records · Includes local camera detections")) : t("Flagged by AI")
         }
         negative
       />
@@ -176,7 +176,7 @@ export function Overview() {
                   : t("Monitoring active")}
         </Badge>
       </div>
-      <MetricRow events={events} />
+      <MetricRow events={events} useAllRecords />
       <div className="overview-layout">
         <div className="overview-main">
           <section className="panel recommendation-panel">
@@ -188,7 +188,7 @@ export function Overview() {
                 </h2>
                 <p>
                   {failuresOnly
-                    ? t("Spring Boot quality decisions · latest 20 FAIL records")
+                    ? t("Recent failures from both sources")
                     : t("Latest inspections · AI decisions and operator review queue")}
                 </p>
               </div>
@@ -209,7 +209,7 @@ export function Overview() {
                     key={option.value}
                     disabled={
                       failuresOnly &&
-                      (option.value === "pass" || option.value === "pending")
+                      option.value === "pass"
                     }
                     aria-pressed={queue === option.value}
                     onClick={() => setQueue(option.value)}
@@ -282,7 +282,7 @@ export function Overview() {
             </div>
             <p className="card-footnote">
               {failuresOnly
-                ? t("Production defect rate and model accuracy cannot be calculated from the latest 20 failures.")
+                ? t("Production defect rate and model accuracy cannot be calculated from failure-only records.")
                 : t("This is not a model accuracy measurement; labeled ground truth is required.")}
             </p>
           </section>
@@ -296,7 +296,7 @@ export function Overview() {
                 </h2>
                 <p>
                   {failuresOnly
-                    ? t("Received FAIL records over the last 3 hours")
+                    ? t("Recent recorded failures")
                     : t("Last 3 hours · 15-minute production intervals")}
                 </p>
               </div>
@@ -315,11 +315,11 @@ export function Overview() {
               </div>
               <div>
                 <small>{t("REVIEWED")}</small>
-                <strong>{failuresOnly ? "—" : reviewed}</strong>
+                <strong>{reviewed}</strong>
               </div>
               <div>
                 <small>{t("PENDING")}</small>
-                <strong>{failuresOnly ? "—" : pending.length}</strong>
+                <strong>{pending.length}</strong>
               </div>
             </div>
             <div className="chart-bottom">
@@ -657,8 +657,36 @@ export function Stations() {
   const t = useT();
   const { language } = useLanguage();
   const { snapshot, offline, error, preferences, now, mode } = useApp();
+  const [localModel, setLocalModel] = useState<"checking" | "ready" | "unavailable">("checking");
+  const [localDevice, setLocalDevice] = useState("");
+  useEffect(() => {
+    if (mode !== "api") return;
+    const controller = new AbortController();
+    let timer: ReturnType<typeof setTimeout>;
+    async function check() {
+      try {
+        const response = await fetch("http://127.0.0.1:8765/health", {signal: AbortSignal.any([controller.signal, AbortSignal.timeout(4000)])});
+        if (!response.ok) throw new Error();
+        const value: unknown = await response.json();
+        if (!value || typeof value !== "object" || !("status" in value) || value.status !== "ready") throw new Error();
+        if (!controller.signal.aborted) {
+          setLocalModel("ready");
+          setLocalDevice("device" in value && typeof value.device === "string" ? value.device : "");
+        }
+      } catch { if (!controller.signal.aborted) { setLocalModel("unavailable"); setLocalDevice(""); } }
+      if (!controller.signal.aborted) timer = setTimeout(check, 10000);
+    }
+    void check();
+    return () => { controller.abort(); clearTimeout(timer); };
+  }, [mode]);
   return (
     <>
+      {mode === "api" && <section className="panel" style={{marginBottom: 16}}>
+        <h2>{t("Local model service")}</h2>
+        <Badge tone={localModel === "ready" ? "success" : "warning"}>{t(localModel === "ready" ? "Model service ready" : localModel === "checking" ? "Checking model service" : "Model service unavailable")}</Badge>
+        {localModel === "ready" && <p>{t("Inference device")}: {localDevice === "cpu" ? "CPU" : localDevice ? `GPU ${localDevice}` : t("Unknown")}</p>}
+        <p>{t("The camera opens only on the live monitoring page. This status does not verify camera hardware.")}</p>
+      </section>}
       <p className="muted">{t("Stations are monitored in read-only mode.")}{" "}
         {mode === "demo"
           ? t("Connections are simulated in the demo environment.")

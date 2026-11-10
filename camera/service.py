@@ -30,6 +30,11 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header('Cache-Control', 'no-store')
         self.send_header('Content-Type', 'application/json')
         self.end_headers()
+    def do_GET(self):
+        if self.path != '/health' or self.headers.get('Origin') not in allowed:
+            self.headers_for(403); self.wfile.write(b'{}'); return
+        self.headers_for(200)
+        self.wfile.write(json.dumps({'status': 'ready', 'device': device, 'classes': expected}).encode())
     def do_OPTIONS(self):
         if self.headers.get('Origin') not in allowed:
             self.send_response(403); self.end_headers(); return

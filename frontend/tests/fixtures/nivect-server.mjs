@@ -8,6 +8,9 @@ const server = http.createServer((req, res) => {
     res.end('{"error":"Read-only test fixture"}');
     return;
   }
+  if (req.url === "/api/v1/summary") { res.end('{"legacyFailureRecords":1,"cameraDetectionRecords":0}'); return; }
+  if (req.url === "/api/v1/reviews") { res.end("[]"); return; }
+  if (req.url === "/api/v1/model-detections") { res.end("[]"); return; }
   if (req.url === "/actuator/health") {
     res.end('{"status":"UP"}');
     return;

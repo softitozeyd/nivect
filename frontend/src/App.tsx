@@ -162,7 +162,7 @@ export default function App() {
                 {offline || error
                   ? t("Data connection lost. The latest data may be out of date.")
                   : mode === "api"
-                    ? t("Latest failure records: {count}. Operator reviews are unavailable.").replace("{count}", String(pendingReviews))
+                    ? t("Recent failure records awaiting review: {count}.").replace("{count}", String(pendingReviews))
                     : pendingReviews
                       ? t("There are {count} unreviewed AI defect predictions in this session. Review them in Inspection History.").replace("{count}", String(pendingReviews))
                       : t("There are no unreviewed AI defect predictions in this session.")}
@@ -234,8 +234,8 @@ export default function App() {
             <div className="notice api-scope-banner">
               <Activity size={16} />
               <div>
-                <strong>{t(location.pathname === "/history" ? "Nivect / Spring Boot · Latest 100 inspections" : "Nivect / Spring Boot · Latest 20 failures")}</strong>
-                <p>{t(location.pathname === "/history" ? "History shows the latest 100 saved records. Total production, FPS, camera health, model confidence and image access are unavailable. Assumed backend UTC offset:" : "This API provides FAIL records only. Total production, overall defect rate, FPS, camera health, model confidence, and image access are unavailable. No failure records does not mean production has stopped. Assumed backend UTC offset:")}{" "}
+                <strong>{t(location.pathname === "/history" ? "Nivect / Spring Boot · Latest 100 inspections" : "Nivect / Spring Boot · Recent recorded failures")}</strong>
+                <p>{t(location.pathname === "/history" ? "History shows the latest 100 saved records. Total production, FPS, camera health, model confidence and image access are unavailable. Assumed backend UTC offset:" : "The overview and reports show recent failure records, including local camera detections. They do not represent total production or a defect rate. FPS, station health, and saved images are unavailable. Assumed backend UTC offset:")}{" "}
                   {backendOffset}{' '}{t("(the API provides no time zone).")}{' '}</p>
               </div>
             </div>

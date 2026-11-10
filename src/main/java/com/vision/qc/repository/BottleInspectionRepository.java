@@ -16,6 +16,8 @@ public interface BottleInspectionRepository extends JpaRepository<BottleInspecti
 
     List<BottleInspection> findTop100ByOrderByInspectedAtDescIdDesc();
 
+    long countByOverallResult(String overallResult);
+
     // Son hatalı (FAIL) ürünleri getirme
     List<BottleInspection> findTop20ByOverallResultOrderByInspectedAtDesc(String overallResult);
 }

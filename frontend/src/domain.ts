@@ -99,6 +99,7 @@ export const snapshotSchema = z.object({
   updatedAt: z.string().datetime(),
   coverage: z.enum(["session", "failures-only"]).optional(),
   backendHealth: z.enum(["UP", "DOWN", "UNKNOWN"]).optional(),
+  summary: z.object({ legacyFailureRecords: z.number().int().nonnegative(), cameraDetectionRecords: z.number().int().nonnegative() }).optional(),
 });
 export type Snapshot = z.infer<typeof snapshotSchema>;
 export interface Filters {

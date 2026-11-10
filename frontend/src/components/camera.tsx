@@ -20,6 +20,7 @@ export function CameraPanel() {
   const [prediction, setPrediction] = useState<Prediction | null>(null);
   const [error, setError] = useState("");
   const [saved, setSaved] = useState<Saved[]>([]);
+  const [savedError, setSavedError] = useState(false);
   const [version, setVersion] = useState(0);
   function stop() {
     session.current++;
@@ -33,7 +34,7 @@ export function CameraPanel() {
   useEffect(() => () => { session.current++; recordingRef.current = false; pendingWrite.current?.abort(); stream.current?.getTracks().forEach(track => track.stop()); }, []);
   useEffect(() => {
     const controller = new AbortController();
-    fetch('/api/v1/model-detections', {signal: controller.signal}).then(r => { if (!r.ok) throw Error(); return r.json() as Promise<Saved[]>; }).then(setSaved).catch(() => {});
+    fetch('/api/v1/model-detections', {signal: controller.signal}).then(r => { if (!r.ok) throw Error(); return r.json() as Promise<Saved[]>; }).then(rows => { setSaved(rows); setSavedError(false); }).catch(() => { if (!controller.signal.aborted) setSavedError(true); });
     return () => controller.abort();
   }, [version]);
   async function start() {
@@ -97,6 +98,6 @@ export function CameraPanel() {
     <p aria-live="polite">{prediction ? `${tr ? 'Model tahmini' : 'Model prediction'}: ${prediction.decision === 'FAIL' ? (tr ? 'Hatalı' : 'Defect') : prediction.decision === 'PASS' ? (tr ? 'Kusur tespit edilmedi' : 'No defect detected') : (tr ? 'Kontrol gerekli' : 'Review needed')}${prediction.defects.length ? ' · ' + prediction.defects.map(label).join(', ') : ''}` : (tr ? 'Tahmin bekleniyor.' : 'Waiting for a prediction.')}</p>
     <p className="info-note">{tr ? 'Yalnızca üç ardışık tahminde görülen hatalar kaydedilir. Yeni şişeyi saymak için şişeyi bir süre kadrajdan çıkarın. Bu yöntem kesin ürün sayımı sağlamaz; eşikler test aşamasındadır.' : 'Only defects detected in three consecutive predictions are saved. Remove the bottle briefly before the next product. This is not precise counting; thresholds are experimental.'}</p>
     <h3>{tr ? 'Kaydedilen model tespitleri' : 'Saved model detections'}</h3>
-    {saved.length ? <ul>{saved.slice(0, 10).map(item => <li key={item.id}>{new Date(item.recordedAt).toLocaleString(tr ? 'tr-TR' : 'en-US')} · {item.defects.split(',').map(label).join(', ')}</li>)}</ul> : <p>{tr ? 'Henüz kayıt yok.' : 'No saved detections yet.'}</p>}
+    {savedError ? <p role="alert">{tr ? 'Kayıtlar alınamadı; bağlantıyı kontrol edin.' : 'Could not load saved records; check the connection.'}</p> : saved.length ? <ul>{saved.slice(0, 10).map(item => <li key={item.id}>{new Date(item.recordedAt).toLocaleString(tr ? 'tr-TR' : 'en-US')} · {item.defects.split(',').map(label).join(', ')}</li>)}</ul> : <p>{tr ? 'Henüz kayıt yok.' : 'No saved detections yet.'}</p>}
   </section>;
 }
