@@ -88,6 +88,29 @@ parola yerel `.env` dosyasındaki `QC_OPERATOR_PASSWORD` değeridir.
 Windows ve Docker adımları, kamera izni ve model servisi yapılandırması için
 [geliştirici başlangıç rehberine](docs/getting-started.md) bakın.
 
+## YOLO11m eğitimi
+
+Güncel modeli üreten [H100 eğitim betiği](training/train_h100_yolo.py),
+CUDA destekli PyTorch ve `ultralytics==8.4.203` ile çalışır. Ekipten alınan
+eğitim paketini `data/visionqc-h100/` altına açın. Paket kökünde `data.yaml`,
+`manifest.csv`, `images/{train,val}/`, `labels/{train,val}/`,
+`weights/yolo11m.pt` ve onun SHA-256 değerini içeren `weights/source.json`
+bulunur. Kamera paketi çıktısı için aynı klasörde `camera_test.py`,
+`requirements.txt`, `KAMERA-TR.md` ve `BASLAT.cmd` gerekir.
+
+```bash
+python -m pip install -r data/visionqc-h100/requirements.txt
+python training/train_h100_yolo.py --data data/visionqc-h100 --audit-only
+python training/train_h100_yolo.py --data data/visionqc-h100 --output runtime/h100-run
+```
+
+Betik eğitim öncesinde çekim gruplarının ve dosya hash'lerinin bölümler
+arasında çakışmadığını denetler. Eğitim, varsayılan olarak 960 piksel giriş,
+80 epoch üst sınırı ve batch 16 kullanır. `--output` için henüz mevcut
+olmayan bir dizin seçin. Seçilen `best.pt`, model kartı ve kamera paketi
+çıktı dizinine yazılır. Küçük doğrulama grubunun metrikleri model geliştirme
+için kullanılır. Saha performansı bağımsız kamera görüntüleriyle doğrulanır.
+
 ## Depo yapısı
 
 | Dizin | İçerik |
