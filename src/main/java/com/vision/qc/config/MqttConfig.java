@@ -19,7 +19,6 @@ import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.MessageHandler;
 
 @Configuration
-@org.springframework.boot.autoconfigure.condition.ConditionalOnProperty(name="qc.mqtt.enabled", havingValue="true", matchIfMissing=true)
 @RequiredArgsConstructor
 @Slf4j
 public class MqttConfig {
@@ -64,7 +63,6 @@ public class MqttConfig {
         adapter.setCompletionTimeout(5000);
         adapter.setConverter(new DefaultPahoMessageConverter());
         adapter.setQos(1);
-        adapter.setManualAcks(true);
         adapter.setOutputChannel(mqttInputChannel());
         return adapter;
     }
@@ -75,19 +73,12 @@ public class MqttConfig {
         return message -> {
             try {
                 String payload = (String) message.getPayload();
-                if (payload.length() > 16384) throw new IllegalArgumentException("MQTT payload too large");
                 BottleInspectionDto dto = objectMapper.readValue(payload, BottleInspectionDto.class);
-                if (dto.source() != BottleInspectionDto.Source.CAMERA)
-                    throw new IllegalArgumentException("MQTT accepts CAMERA events only");
-                // This dedicated MQTT callback thread waits for the committed transaction.
-                inspectionService.processInspection(dto).block(java.time.Duration.ofSeconds(25));
-                var ack = message.getHeaders().get(
-                    org.springframework.integration.IntegrationMessageHeaderAccessor.ACKNOWLEDGMENT_CALLBACK,
-                    org.springframework.integration.acks.SimpleAcknowledgment.class);
-                if (ack != null) ack.acknowledge();
+                inspectionService.processInspection(dto).subscribe(
+                        unused -> {},
+                        error -> log.error("MQTT inspection Redis'e kaydedilemedi", error));
             } catch (Exception e) {
-                log.error("MQTT event not acknowledged; producer must retain its durable outbox until application confirmation", e);
-                throw new org.springframework.messaging.MessageHandlingException(message, e);
+                log.error("MQTT inspection mesaji islenemedi", e);
             }
         };
     }
