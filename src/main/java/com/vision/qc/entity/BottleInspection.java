@@ -26,4 +26,6 @@ public class BottleInspection {
     @JsonIgnore @Column(length=64) private String payloadHash;
     @JsonIgnore private String imagePath;
     @Column(nullable=false) private LocalDateTime inspectedAt;
+    private Long productionSessionId;
+    private Long productNumber;
 }

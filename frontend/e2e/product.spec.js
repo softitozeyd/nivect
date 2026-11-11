@@ -107,7 +107,7 @@ test("operator session, real records, CSV, simulated webcam preview, model-not-r
   await expect(page.getByText("Önizleme açık", { exact: true })).toBeVisible();
   await expect(page.locator("video")).toBeVisible();
   await expect(
-    page.getByRole("button", { name: "Tespiti başlat" }),
+    page.getByRole("button", { name: "Kaydı başlat" }),
   ).toBeDisabled();
   await page.screenshot({ path: screenshotDir + "/camera-preview.png" });
   await page.getByRole("button", { name: "Kapat", exact: true }).click();

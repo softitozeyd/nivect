@@ -52,6 +52,7 @@ export default function Dashboard({ user, onExit, onLogout }) {
   const [tab, setTab] = useState("overview"),
     [nav, setNav] = useState(false),
     [overview, setOverview] = useState(null),
+    [production, setProduction] = useState(null),
     [records, setRecords] = useState(null),
     [model, setModel] = useState(null),
     [health, setHealth] = useState(false),
@@ -73,7 +74,7 @@ export default function Dashboard({ user, onExit, onLogout }) {
       const request = ++requestVersion.current;
       if (!quiet) setLoading(true);
       try {
-        const [o, r, m, h] = await Promise.all([
+        const [o, r, m, h, session] = await Promise.all([
           api(
             "/api/v1/overview?" +
               new URLSearchParams({
@@ -95,9 +96,11 @@ export default function Dashboard({ user, onExit, onLogout }) {
           ),
           api("/api/v1/vision/status"),
           api("/actuator/health"),
+          api("/api/v1/production-sessions/latest"),
         ]);
         if (request !== requestVersion.current) return;
         setOverview(o);
+        setProduction(session.session);
         setRecords(r);
         setModel(m);
         setHealth(h.status === "UP");
@@ -172,7 +175,7 @@ export default function Dashboard({ user, onExit, onLogout }) {
       setLoggingOut(false);
     }
   }
-  const totals = overview?.totals || {},
+  const totals = source === "CAMERA" && production ? {total: production.totalCount, passed: production.passCount, failed: production.failCount, review: production.reviewCount} : overview?.totals || {},
     total = Number(totals.total) || 0;
   const passRate = total ? (Number(totals.passed) / total) * 100 : 0;
   function changeTab(t) {
@@ -372,9 +375,10 @@ export default function Dashboard({ user, onExit, onLogout }) {
           )}
           {tab === "overview" && (
             <>
+              {source === "CAMERA" && <p className="session-coverage">{production ? `Sayaçlar son kamera oturumu #${production.id} içindir. Aşağıdaki liste ve grafikler seçili filtredeki kayıtlı hataları gösterir.` : "Henüz kamera oturumu yok. Aşağıdaki liste ve grafikler kayıtlı olayları gösterir."} Kararsız ürünler ayrılacak olarak kabul edilir; fiziksel ayırma yapılmaz.</p>}
               <div className="stat-grid">
                 {[
-                  ["İncelenen şişe", total, "Kalıcı olay kaydı", "total"],
+                  ["İncelenen şişe", total, source === "CAMERA" && production ? "Kamera test oturumu sayacı" : "Kalıcı olay kaydı", "total"],
                   [
                     "Geçti",
                     totals.passed,
@@ -384,18 +388,18 @@ export default function Dashboard({ user, onExit, onLogout }) {
                     "pass",
                   ],
                   [
-                    "Kusurlu",
-                    totals.failed,
-                    "Kapsam içi kusur tespiti",
+                    "Hatalı / ayrılacak",
+                    source === "CAMERA" && production ? Number(totals.failed) + Number(totals.review) : totals.failed,
+                    source === "CAMERA" && production ? "Kararsızlar dahil" : "Kapsam içi kusur tespiti",
                     "fail",
                   ],
                   [
                     "İnceleme bekliyor",
                     totals.review,
-                    "Düşük güven / belirsiz görüntü",
+                    source === "CAMERA" && production ? "Hatalı / ayrılacak sayısına dahil" : "Düşük güven / belirsiz görüntü",
                     "review",
                   ],
-                ].map(([label, value, note, style]) => (
+                ].filter(([, , , style]) => !(source === "CAMERA" && production && style === "review")).map(([label, value, note, style]) => (
                   <section className={`stat-card ${style}`} key={label}>
                     <span>
                       {label}

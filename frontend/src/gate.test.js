@@ -1,33 +1,9 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { BottleGate } from "./gate.js";
-const bottle = {
-  bottleFound: true,
-  bottleCount: 1,
-  defects: [],
-  confidence: 0.9,
-  modelVersion: "test",
-};
-test("one event per bottle, re-arm after empty zone", () => {
-  const g = new BottleGate(3, 2);
-  let n = 0;
-  for (let i = 0; i < 30; i++) if (g.observe(bottle)) n++;
-  assert.equal(n, 1);
-  g.observe({ bottleFound: false });
-  g.observe(bottle);
-  assert.equal(g.observe(bottle), null);
-  g.observe({ bottleFound: false });
-  g.observe({ bottleFound: false });
-  for (let i = 0; i < 3; i++) if (g.observe(bottle)) n++;
-  assert.equal(n, 2);
-});
-test("ambiguous scenes never pass and defects persist", () => {
-  const g = new BottleGate(2, 2);
-  for (let i = 0; i < 10; i++)
-    assert.equal(g.observe({ ...bottle, bottleCount: 2 }), null);
-  assert.equal(g.observe(bottle), null);
-  g.observe({ bottleFound: false });
-  g.observe({ bottleFound: false });
-  g.observe({ ...bottle, defects: ["missing_cap"] });
-  assert.deepEqual(g.observe(bottle).defects, ["missing_cap"]);
-});
+const bottle={bottleFound:true,bottleCount:1,defects:[],confidence:0.9,modelVersion:"test"};
+const empty={bottleFound:false};
+test("count once only when a bottle leaves",()=>{const g=new BottleGate(3,2);for(let i=0;i<6;i++)assert.equal(g.observe(bottle),null);assert.equal(g.observe(empty),null);assert.equal(g.observe(empty).uncertain,false);assert.equal(g.observe(empty),null)});
+test("one fleeting defect is uncertain and three consecutive confirm it",()=>{let g=new BottleGate(3,2);g.observe({...bottle,defects:["missing_cap"]});g.observe(bottle);g.observe(bottle);g.observe(empty);assert.deepEqual(g.observe(empty).defects,[]);g=new BottleGate(3,2);for(let i=0;i<3;i++)g.observe({...bottle,defects:["underfill"]});g.observe(empty);assert.deepEqual(g.observe(empty).defects,["underfill"])});
+test("multiple or short observations are not counted",()=>{const g=new BottleGate(3,2);g.observe({...bottle,bottleCount:2});g.observe(bottle);g.observe(empty);assert.equal(g.observe(empty),null);g.observe(bottle);g.observe(empty);assert.equal(g.observe(empty),null)});
+test("recovers after overlapping bottles leave",()=>{const g=new BottleGate(3,2);g.observe({...bottle,bottleCount:2});g.observe(empty);assert.equal(g.observe(empty),null);for(let i=0;i<3;i++)g.observe(bottle);g.observe(empty);assert.equal(g.observe(empty).uncertain,false)});

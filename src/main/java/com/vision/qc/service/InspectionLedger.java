@@ -34,7 +34,10 @@ public class InspectionLedger {
     }
 
     @Transactional
-    public BottleInspection record(BottleInspectionDto dto) {
+    public BottleInspection record(BottleInspectionDto dto) { return record(dto, false); }
+
+    @Transactional
+    public BottleInspection record(BottleInspectionDto dto, boolean forceReview) {
         if (!validator.validate(dto).isEmpty())
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Inspection fields are missing or invalid");
         if (dto.capturedAt().isAfter(Instant.now().plusSeconds(300)))
@@ -54,11 +57,11 @@ public class InspectionLedger {
                 """,dto.eventId(),dto.lineCode(),dto.cameraId(),
                 !dto.defects().contains(BottleInspectionDto.Defect.missing_cap)
                     && !dto.defects().contains(BottleInspectionDto.Defect.loose_cap),
-                true,!dto.defects().contains(BottleInspectionDto.Defect.underfill),verdict(dto),
+                true,!dto.defects().contains(BottleInspectionDto.Defect.underfill),forceReview ? "REVIEW" : verdict(dto),
                 dto.bottleFound(),dto.confidence(),dto.modelVersion(),dto.source().name(),defects,hash,
                 LocalDateTime.ofInstant(dto.capturedAt(),ZoneOffset.UTC));
             BottleInspection saved=repository.findByEventId(dto.eventId()).orElseThrow();
-            if (!hash.equals(saved.getPayloadHash()))
+            if (!hash.equals(saved.getPayloadHash()) || (forceReview && !"REVIEW".equals(saved.getOverallResult())))
                 throw new ResponseStatusException(HttpStatus.CONFLICT,"eventId already belongs to a different payload");
             return saved;
         } catch (ResponseStatusException e) { throw e; }

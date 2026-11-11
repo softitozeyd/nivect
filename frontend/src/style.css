@@ -2752,3 +2752,11 @@ td small {
     object-position: 39% center;
   }
 }
+.session-summary { margin:18px 0 0; padding:18px; background:#f3f7f3; border:1px solid #dce8df; border-radius:12px; }
+.session-summary > div:first-child { display:flex; justify-content:space-between; gap:10px; }
+.session-summary > div:first-child span,.session-summary small { color:#62766c; font-size:12px; }
+.session-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; margin-top:12px; }
+.session-grid div { display:grid; gap:5px; padding:12px; background:white; border:1px solid #e0e9e1; border-radius:8px; }
+.session-grid strong { font-size:22px; }
+.session-summary p { font-size:12px; color:#62766c; margin:12px 0 0; }
+.session-coverage { background:#f2f7f2; border:1px solid #dce8df; border-radius:10px; padding:12px 14px; color:#536c5d; font-size:13px; }
