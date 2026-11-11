@@ -61,9 +61,9 @@ Operatör API’den gelen kayıtları filtreleyebilir ve CSV olarak indirebilir.
 ### Projenin durumu
 
 Operatör girişi, kamera önizlemesi, inceleme kaydı ve CSV dışa aktarımı
-uygulamada mevcut. Model tabanlı tespiti çalıştırmak için sınıf sırası
-doğrulanmış bir `best.pt` dosyası yerel model servisine bağlanır. Ağırlık
-dosyası ve eğitim verisi depo dışında tutulur.
+uygulamada mevcut. Güncel tespit modeli, 10 Kasım 2026 tarihli YOLO11m
+eğitiminden alınmıştır. Ağırlık dosyası ve eğitim verisi depo dışında tutulur.
+Dosyayı doğrulamak ve modeli bağlamak için [model kurulumuna](docs/getting-started.md#pc-kamerası-ve-gerçek-tespit) bakın.
 
 Üretim hattında kullanım için fiziksel kamera, hat hızı ve karar eşiklerinin
 saha verisiyle doğrulanması gerekir. Otomatik fiziksel ayırma ilk kapsamın dışındadır.

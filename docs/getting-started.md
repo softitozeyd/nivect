@@ -3,8 +3,9 @@
 PET şişe kalite kontrolü için ürün temeli: Türkçe web arayüzü, operatör oturumu,
 PC kamera önizlemesi, yerel model servisi, kalıcı inceleme kayıtları ve MQTT adaptörü.
 
-**Model henüz depoda yok.** Kamera önizlemesi ve kayıt yönetimi çalışır; gerçek
-kusur tespiti için eğitilmiş, sınıf sırası doğrulanmış `best.pt` gerekir.
+Güncel model, 10 Kasım 2026 tarihli YOLO11m eğitiminden alınmıştır. Kamera
+önizlemesi ve kayıt yönetimi kullanılabilir. Model tabanlı tespit için
+Git dışında saklanan `best.pt` dosyası gerekir.
 Mevcut kapsam: `bottle`, `underfill`, `missing_cap`, `loose_cap`.
 Etiket ve yabancı madde bu modelin kabul kapsamında değildir.
 
@@ -40,12 +41,18 @@ Opsiyonel model servisi için ayrıca `-f compose.yaml -f compose.vision.yaml` e
 
 1. Operasyon panelinde **Kamera → Kamerayı aç**. Tarayıcı kamera izni ister.
 2. Model yüklenmemişse önizleme açılır; tespit kapalı kalır.
-3. Güvendiğiniz eğitilmiş ağırlığı yerel diske koyun; model bağımlılıklarını yükleyin:
+3. Güncel YOLO11m ağırlığını ekipten alıp `models/best.pt` yoluna koyun.
+   SHA-256 değeri `6965529ce3d730b05446b483883f946c7b46723471b8311f73b7eb6c97cf3dbd`
+   olmalıdır. Dosya 40.554.028 bayttır ve Ultralytics 8.4.203 ile eğitilmiştir.
 
 ```bash
 .venv/bin/pip install -r camera/requirements-model.txt
-QC_MODEL_PATH=/absolute/path/best.pt .venv/bin/uvicorn camera.server:app --host 127.0.0.1 --port 9000
+QC_MODEL_PATH=models/best.pt .venv/bin/uvicorn camera.server:app --host 127.0.0.1 --port 9000
 ```
+
+Docker kurulumunda `compose.vision.yaml` aynı dosyayı yerel `models/`
+klasöründen bağlar. Servisin `/health` yanıtındaki `modelReady` alanı
+yükleme durumunu gösterir.
 
 Var olan model servisini önce durdurun. `QC_MODEL_PATH` servis başlatılırken okunur.
 Torch CPU/GPU seçimi ve Ultralytics lisansı için [ürün rehberine](product.md) bakın.
@@ -96,7 +103,7 @@ Arayüz testleri MANUAL kaynaklı test kayıtları bırakır; kamera KPI'larına
   PASS, modelin kapsamı dışında kalan kusurlar için güvence değildir.
 
 [Ürün ve üretime geçiş rehberi](product.md) · [API sözleşmesi](api.md) ·
-[Altyapı ayrıntıları](infrastructure.md) · [Araştırma not defteri](../visionqc_ron88_train.ipynb)
+[Altyapı ayrıntıları](infrastructure.md) · [Model ve eğitim rehberi](product.md#training-and-model-promotion)
 
 Mevcut not defterinin aynı çekim ortamında bildirdiği yüksek metrikler, yeni bir
 kamerada veya üretim hattında doğruluk kanıtı değildir. Eğitim verisi ve model

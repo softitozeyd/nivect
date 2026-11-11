@@ -54,9 +54,10 @@ execution requires hardware-specific installation and validation.
 
 ## Training and model promotion
 
-The original notebook remains available for research. Its temporal split does
-not guarantee physical-bottle independence. Do not use its previously reported
-mAP as a production KPI. `training/train.py` requires a reviewed manifest with
+The current checkpoint is the YOLO11m model trained on 10 November 2026.
+See the [model setup instructions](getting-started.md#pc-kamerası-ve-gerçek-tespit)
+for its checksum and installation path. Field performance still requires
+an independent camera trial. For future runs, `training/train.py` requires a reviewed manifest with
 `image,split,bottle_id,session_id`; rejects cross-split bottle/session IDs and
 identical-image leakage, checks the canonical class order and supplies the
 manifest's actual image lists to training. YOLO image/label layout is required.
