@@ -19,7 +19,9 @@ export default function Camera({ model, onSaved }) {
     [observation, setObservation] = useState(null),
     [line, setLine] = useState("line-1"),
     [pending, setPending] = useState(0),
-    [saved, setSaved] = useState(0);
+    [saved, setSaved] = useState(0),
+    [production, setProduction] = useState(null),
+    [sessionBusy, setSessionBusy] = useState(false);
   const video = useRef(),
     canvas = useRef(),
     streamRef = useRef(),
@@ -28,23 +30,24 @@ export default function Camera({ model, onSaved }) {
     busy = useRef(false),
     alive = useRef(true),
     lineRef = useRef(line),
-    onSavedRef = useRef(onSaved);
+    onSavedRef = useRef(onSaved),
+    productionRef = useRef(null);
   lineRef.current = line;
   onSavedRef.current = onSaved;
   async function flush() {
-    if (busy.current) return;
+    if (busy.current) return false;
     busy.current = true;
     try {
       let queue = await pendingEvents();
       if (alive.current) setPending(queue.length);
       while (queue.length) {
-        await api("/api/v1/inspections", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(queue[0]),
+        const queued = queue[0];
+        const isSessionEvent = !!queued.productionSessionId;
+        const response = await api(isSessionEvent ? `/api/v1/production-sessions/${queued.productionSessionId}/products` : "/api/v1/inspections", {
+          method: "POST", headers: {"Content-Type": "application/json"},
+          body: JSON.stringify(isSessionEvent ? {expectedProductNumber: queued.expectedProductNumber, uncertain: queued.uncertain, inspection: queued.inspection} : queued),
         });
+        if (isSessionEvent) { productionRef.current = response.session; if (alive.current) setProduction(response.session); }
         await acknowledgeEvent(queue[0].eventId);
         queue = await pendingEvents();
         if (alive.current) {
@@ -53,8 +56,10 @@ export default function Camera({ model, onSaved }) {
           onSavedRef.current();
         }
       }
+      return true;
     } catch (e) {
       if (alive.current) setError(`Kayıt kuyruğu: ${e.message}`);
+      return false;
     } finally {
       busy.current = false;
     }
@@ -62,6 +67,7 @@ export default function Camera({ model, onSaved }) {
   useEffect(() => {
     alive.current = true;
     flush();
+    api("/api/v1/production-sessions/latest").then(({session}) => { if (alive.current) {productionRef.current = session; setProduction(session);} }).catch(e => {if (alive.current) setError(e.message);});
     const t = setInterval(flush, 10000);
     return () => {
       alive.current = false;
@@ -153,9 +159,12 @@ export default function Camera({ model, onSaved }) {
       setObservation(result);
       const event = gate.current.observe(result);
       if (event) {
+        if (!productionRef.current?.active) throw Error("Aktif üretim oturumu bulunamadı.");
+        const {uncertain, ...inspection} = event;
+        const eventId = crypto.randomUUID();
         const full = {
-          ...event,
-          eventId: crypto.randomUUID(),
+          ...inspection,
+          eventId,
           lineCode: lineRef.current,
           cameraId: "pc-browser",
           source: "CAMERA",
@@ -166,9 +175,9 @@ export default function Camera({ model, onSaved }) {
           throw Error(
             "Yerel kayıt kuyruğu doldu. Bağlantıyı düzeltmeden tespit devam edemez.",
           );
-        await enqueueEvent(full);
+        await enqueueEvent({eventId, productionSessionId: productionRef.current.id, expectedProductNumber: productionRef.current.totalCount + 1, uncertain, inspection: full});
         setPending(queue.length + 1);
-        flush();
+        if (!await flush()) throw Error("Ürün kaydı bekliyor; bağlantıyı düzeltip tekrar gönderin.");
       }
     } catch (e) {
       if (alive.current) {
@@ -180,17 +189,37 @@ export default function Camera({ model, onSaved }) {
     }
     if (runningRef.current) setTimeout(inspect, 650);
   }
-  function toggle() {
-    if (running) {
-      runningRef.current = false;
-      setRunning(false);
-    } else {
-      setError("");
-      gate.current.reset();
-      runningRef.current = true;
-      setRunning(true);
-      inspect();
-    }
+  async function toggle() {
+    if (sessionBusy) return;
+    setSessionBusy(true); setError("");
+    try {
+      if (runningRef.current) {
+        runningRef.current = false; setRunning(false);
+        if (!await flush()) throw Error("Bekleyen kayıtlar gönderilmeden oturum bitirilemez.");
+        if (productionRef.current?.active) {
+          const ended = await api(`/api/v1/production-sessions/${productionRef.current.id}/stop`, {method:"POST"});
+          productionRef.current = ended; setProduction(ended);
+        }
+      } else {
+        if (!await flush()) throw Error("Bekleyen kayıtlar gönderilmeden yeni tespit başlatılamaz.");
+        const latest = await api("/api/v1/production-sessions/latest");
+        const current = latest.session?.active ? latest.session : await api("/api/v1/production-sessions", {method:"POST"});
+        productionRef.current = current; setProduction(current);
+        if (!alive.current || !streamRef.current) return;
+        gate.current.reset(); runningRef.current = true; setRunning(true); inspect();
+      }
+    } catch(e) { if(alive.current) setError(e.message); }
+    finally { if(alive.current) setSessionBusy(false); }
+  }
+  async function endSession() {
+    if (sessionBusy || !productionRef.current?.active) return;
+    setSessionBusy(true); setError("");
+    try {
+      if (!await flush()) throw Error("Bekleyen kayıtlar gönderilmeden oturum bitirilemez.");
+      const ended = await api(`/api/v1/production-sessions/${productionRef.current.id}/stop`, {method:"POST"});
+      productionRef.current = ended; setProduction(ended);
+    } catch(e) { if(alive.current) setError(e.message); }
+    finally { if(alive.current) setSessionBusy(false); }
   }
   return (
     <div className="camera-layout">
@@ -250,9 +279,9 @@ export default function Camera({ model, onSaved }) {
               <Action
                 className="btn primary"
                 onClick={toggle}
-                disabled={!model?.modelReady || !line}
+                disabled={!model?.modelReady || !line || sessionBusy}
               >
-                {running ? "Tespiti duraklat" : "Tespiti başlat"}
+                {running ? "Kaydı durdur" : "Kaydı başlat"}
                 <ScanLine size={16} />
               </Action>
             </>
@@ -262,9 +291,15 @@ export default function Camera({ model, onSaved }) {
             </Action>
           )}
           <span>
-            {saved} kaydedildi · {pending} bekliyor
+            {saved} işlendi · {pending} bekliyor
           </span>
         </div>
+        <section className="session-summary" aria-label="Üretim oturumu sayaçları">
+          <div><strong>Üretim oturumu {production ? `#${production.id}` : ""}</strong><span>{production?.active ? "Açık" : production ? "Tamamlandı" : "Henüz oturum yok"}</span></div>
+          <div className="session-grid"><div><small>Toplam</small><strong>{production?.totalCount ?? "—"}</strong></div><div><small>Uygun</small><strong>{production?.passCount ?? "—"}</strong></div><div><small>Hatalı</small><strong>{production ? production.failCount + production.reviewCount : "—"}</strong></div></div>
+          <p>Kararsız ürünler hatalı sayılır. Kamera denemesi kesin bant sayımı değildir; fiziksel ayırma yapılmaz.</p>
+          {production?.active && !running && <Action className="btn" disabled={sessionBusy} onClick={endSession}>Oturumu bitir</Action>}
+        </section>
         {error && (
           <div className="error" role="alert">
             <AlertCircle size={17} />
@@ -283,8 +318,7 @@ export default function Camera({ model, onSaved }) {
           <h3>Tek şişe. Net görüntü.</h3>
           <p>
             Şişeyi tamamen kadraja alın. Sabit ışık ve sade bir arka plan
-            kullanın. Beş ardışık gözlem bir kayıt oluşturur; yeni şişe için
-            alan beş gözlem boyunca boş kalmalıdır.
+            kullanın. Şişeyi en az beş gözlem boyunca gösterin, ardından kadrajdan çıkarın. Hatalı ve kararsız ürünler kaydedilir; uygun ürünler yalnızca sayılır.
           </p>
           <label>
             Üretim hattı
