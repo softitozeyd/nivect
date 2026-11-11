@@ -3,26 +3,35 @@ package com.vision.qc.controller;
 import com.vision.qc.dto.BottleInspectionDto;
 import com.vision.qc.entity.BottleInspection;
 import com.vision.qc.service.BottleInspectionService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
-import reactor.core.publisher.*;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
-@RestController @RequestMapping("/api/v1/inspections") @RequiredArgsConstructor
+@RestController
+@RequestMapping("/api/v1/inspections")
+@RequiredArgsConstructor
 public class BottleInspectionController {
-    private final BottleInspectionService service;
-    @PostMapping @ResponseStatus(HttpStatus.ACCEPTED)
-    public Mono<BottleInspection> receiveInspection(@Valid @RequestBody BottleInspectionDto dto, Authentication auth) {
-        boolean ingest=auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_INGEST"));
-        if(ingest && dto.source()!=BottleInspectionDto.Source.CAMERA)
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN,"Camera credentials can only submit CAMERA events");
-        return service.processInspection(dto);
+
+    private final BottleInspectionService inspectionService;
+
+    // HTTP üzerinden manuel test veya HTTP gönderimi için
+    @PostMapping
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public Mono<Void> receiveInspection(@RequestBody BottleInspectionDto dto) {
+        return inspectionService.processInspection(dto);
     }
+
+    // Dashboard history: bounded to the 100 most recent saved records.
     @GetMapping
-    public Flux<BottleInspection> getRecentInspections() {return service.getRecentInspections();}
+    public Flux<BottleInspection> getRecentInspections() {
+        return inspectionService.getRecentInspections();
+    }
+
+    // Dashboard için son hatalı ürünleri getiren endpoint
     @GetMapping("/failures")
-    public Flux<BottleInspection> getRecentFailures() {return service.getRecentFailures();}
+    public Flux<BottleInspection> getRecentFailures() {
+        return inspectionService.getRecentFailures();
+    }
 }

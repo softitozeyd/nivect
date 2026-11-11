@@ -1,9 +1,0 @@
-# Add only in this managed cloud runtime. The platform certificate stays out of image layers.
-services:
-  backend:
-    build:
-      secrets:
-        - proxy_ca
-secrets:
-  proxy_ca:
-    file: ${CODEX_PROXY_CERT:?Platform CA certificate path is required}

@@ -9,19 +9,9 @@ snapshots
 venv
 __pycache__
 *.ipynb
-node_modules
-**/node_modules
-runtime
-.venv
-frontend/test-results
-frontend/playwright-report
-frontend/e2e
-*.sqlite3*
-tests
-models
-data
-training
-test-results
 
-# The historical frontend is a separate optional build.
-legacy
+frontend
+training
+tests
+docs
+node_modules
