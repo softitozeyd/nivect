@@ -109,3 +109,9 @@ body { background: #eef2ee; color: #1b302c; }
 .cloud-shell .production-counters p, .cloud-shell .production-overview p { color:#71877b; margin:12px 0 0; font-size:12px; }
 .session-open-note { display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-top:12px; color:#876328; font-size:12px; }
 @media(max-width:600px) { .production-counter-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .production-counters { padding:18px; } }
+
+/* Match the preview to the camera frame so its full area remains visible. */
+.camera-workspace { grid-template-columns: minmax(0, 1fr) minmax(230px, 290px); }
+.camera-view { height: auto; min-height: 0; aspect-ratio: 4 / 3; }
+.camera-view video { width: 100%; height: 100%; }
+@media (max-width: 760px) { .camera-workspace { grid-template-columns: minmax(0, 1fr); } .camera-view { height: auto; min-height: 0; } }

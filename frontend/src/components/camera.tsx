@@ -25,6 +25,7 @@ export function CameraPanel() {
   const { production, sessionLoading, sessionError, startSession, stopSession, setProduction } = useProductionSession();
   const [sessionBusy, setSessionBusy] = useState(false);
   const [active, setActive] = useState(false);
+  const [cameraAspect, setCameraAspect] = useState("4 / 3");
   const [starting, setStarting] = useState(false);
   const [recording, setRecording] = useState(false);
   const [prediction, setPrediction] = useState<Prediction | null>(null);
@@ -151,7 +152,7 @@ export function CameraPanel() {
     </div>
     <div className="camera-workspace">
       <div className="camera-main">
-        <div className="camera-view"><video ref={video} playsInline muted aria-label={tr ? "Canlı kamera görüntüsü" : "Live camera video"} />
+        <div className="camera-view" style={{aspectRatio: cameraAspect}}><video ref={video} onLoadedMetadata={(e) => { const v = e.currentTarget; if (v.videoWidth && v.videoHeight) setCameraAspect(`${v.videoWidth} / ${v.videoHeight}`); }} playsInline muted aria-label={tr ? "Canlı kamera görüntüsü" : "Live camera video"} />
           {active && prediction && <svg className="camera-overlay" viewBox={`0 0 ${prediction.width} ${prediction.height}`} preserveAspectRatio="xMidYMid meet" aria-hidden="true">{prediction.detections.map((d, i) => <g key={i}><rect x={d.box[0]} y={d.box[1]} width={d.box[2]-d.box[0]} height={d.box[3]-d.box[1]} fill="none" stroke={d.name === "bottle" ? "#33df8d" : "#ff5555"} strokeWidth="3"/><text x={d.box[0]} y={Math.max(16, d.box[1]-5)} fill="white" stroke="#14252c" strokeWidth="3" paintOrder="stroke" fontSize="16">{label(d.name)} {Math.round(d.confidence*100)}%</text></g>)}</svg>}
           {!active && <div className="camera-placeholder"><span><Camera size={27} /></span><strong>{tr ? "Kamera görüntüsü kapalı" : "Camera feed is off"}</strong><p>{tr ? "Başlamak için kamerayı açın." : "Start the camera to begin."}</p></div>}
           {active && <span className="camera-live-label"><span />LIVE</span>}
