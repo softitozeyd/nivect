@@ -6,6 +6,7 @@ export default defineConfig({
   timeout: 45000,
   reporter: "list",
   use: {
+    channel: process.env.CI ? "chrome" : undefined,
     baseURL: process.env.NIVECT_UI_URL || "http://127.0.0.1:5173",
     headless: true,
     launchOptions: {
