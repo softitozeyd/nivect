@@ -25,7 +25,7 @@ export function CameraPanel() {
   const { production, sessionLoading, sessionError, startSession, stopSession, setProduction } = useProductionSession();
   const [sessionBusy, setSessionBusy] = useState(false);
   const [active, setActive] = useState(false);
-  const [cameraAspect, setCameraAspect] = useState("4 / 3");
+  const [cameraAspect, setCameraAspect] = useState("16 / 9");
   const [starting, setStarting] = useState(false);
   const [recording, setRecording] = useState(false);
   const [prediction, setPrediction] = useState<Prediction | null>(null);

@@ -14,7 +14,7 @@ export const MODEL_DETECTIONS_PATH = "/api/v1/model-detections";
 export const REVIEWS_PATH = "/api/v1/reviews";
 export const SUMMARY_PATH = "/api/v1/summary";
 export const HEALTH_PATH = "/actuator/health";
-export const petProduct = "Ron 88 · PET water bottle";
+export const petProduct = "PET bottle";
 export const backendOffset =
   import.meta.env.VITE_BACKEND_UTC_OFFSET || "Z";
 const localTimestamp = z

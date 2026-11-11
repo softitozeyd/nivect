@@ -125,3 +125,54 @@ body { background: #eef2ee; color: #1b302c; }
 @media (max-width: 760px) { .camera-sidebar { display: block; } }
 
 .camera-counter-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.production-overview .production-counter-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+@media (max-width: 480px) { .production-overview .production-counter-grid { grid-template-columns: 1fr; } }
+.cloud-shell .metric-grid.single-metric { grid-template-columns: minmax(0, 1fr); }
+
+/* Keep the camera and controls visible together without cropping the video. */
+.camera-workspace { grid-template-columns: minmax(0, 1fr) minmax(240px, 300px); align-items: start; }
+.camera-view { width: 100%; max-height: min(66svh, 700px); }
+.camera-view video { min-width: 0; min-height: 0; object-fit: contain; }
+.camera-sidebar { display: block; }
+.camera-sidebar .camera-divider { display: block; }
+@media (max-width: 900px) {
+  .camera-workspace { grid-template-columns: minmax(0, 1fr); }
+  .camera-view { max-height: 60svh; }
+}
+
+/* Subtle feedback within the existing VisionQC design. */
+.cloud-shell .top-navigation a,
+.cloud-shell .primary,
+.cloud-shell .icon-button,
+.cloud-shell .camera-actions button,
+.cloud-shell .overview-shortcut {
+  transition: background-color .2s ease, border-color .2s ease, box-shadow .2s ease, color .2s ease;
+}
+.cloud-shell .top-navigation a svg,
+.cloud-shell .icon-button svg,
+.cloud-shell .camera-actions button svg,
+.cloud-shell .overview-shortcut svg { transition: transform .2s ease; }
+.cloud-shell .top-navigation a:hover svg,
+.cloud-shell .icon-button:hover svg,
+.cloud-shell .camera-actions button:not(:disabled):hover svg,
+.cloud-shell .overview-shortcut:hover svg { transform: translateY(-1px); }
+.cloud-shell .primary:hover,
+.cloud-shell .overview-shortcut:hover { box-shadow: 0 5px 14px #126e6729; }
+.cloud-shell .camera-heading-icon,
+.cloud-shell .camera-result-icon { box-shadow: inset 0 1px 0 #ffffffaa, 0 4px 12px #174a3710; }
+.cloud-shell :is(button, a, select, input):focus-visible { outline: 3px solid #41a995; outline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) {
+  .cloud-shell .top-navigation a,
+  .cloud-shell .primary,
+  .cloud-shell .icon-button,
+  .cloud-shell .camera-actions button,
+  .cloud-shell .overview-shortcut,
+  .cloud-shell .top-navigation a svg,
+  .cloud-shell .icon-button svg,
+  .cloud-shell .camera-actions button svg,
+  .cloud-shell .overview-shortcut svg { transition: none; }
+  .cloud-shell .top-navigation a:hover svg,
+  .cloud-shell .icon-button:hover svg,
+  .cloud-shell .camera-actions button:not(:disabled):hover svg,
+  .cloud-shell .overview-shortcut:hover svg { transform: none; }
+}

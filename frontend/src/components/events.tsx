@@ -91,7 +91,7 @@ export function EventTable({
                     {e.productNumber && <small>{t("Product number")}: #{e.productNumber}</small>}
                     <small>{formatDate(e.timestamp, preferences.zone, language === "tr" ? "tr-TR" : "en-US")}</small>
                     {recommendations && (
-                      <small className="product-caption">{e.product}</small>
+                      <small className="product-caption">{t(e.product)}</small>
                     )}
                   </div>
                 </div>

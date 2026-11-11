@@ -42,12 +42,12 @@ function ProductionSummary() {
   const {production, sessionError} = useProductionSession();
   const rejected = production ? production.defectCount + production.uncertainCount : 0;
   return <section className="production-overview panel">
-    <div className="production-counters-heading"><strong>{tr ? "Kamera test oturumu" : "Camera test session"}{production ? ` #${production.id}` : ""}</strong><span>{sessionError ? (tr ? "Bağlantı hatası" : "Connection error") : production?.active ? (tr ? "Oturum açık" : "Session open") : production ? (tr ? "Son oturum" : "Last session") : (tr ? "Henüz oturum yok" : "No session yet")}</span></div>
-    <div className="production-counter-grid"><div><small>{tr ? "Toplam sayılan" : "Total counted"}</small><strong>{production?.totalCount ?? "—"}</strong></div><div><small>{tr ? "Uygun" : "Pass"}</small><strong>{production?.passCount ?? "—"}</strong></div><div><small>{tr ? "Ayrılacak (kararsız dahil)" : "To reject (incl. uncertain)"}</small><strong>{production ? rejected : "—"}</strong></div><div><small>{tr ? "Ayrılacak oranı" : "Rejection rate"}</small><strong>{production?.totalCount ? `${(100 * rejected / production.totalCount).toFixed(1)}%` : "—"}</strong></div></div>
-    <p>{tr ? "Yalnızca yerel kamera testindeki sayım; fiziksel ayırma yapılmaz ve kesin bant sayımı değildir." : "Local camera trial counts only; no physical rejection and not an accurate conveyor count."}</p>
+    <div className="production-counters-heading"><strong>{tr ? "Son üretim oturumu" : "Latest production session"}{production ? ` #${production.id}` : ""}</strong><span>{sessionError ? (tr ? "Bağlantı hatası" : "Connection error") : production?.active ? (tr ? "Oturum açık" : "Session open") : production ? (tr ? "Tamamlandı" : "Completed") : (tr ? "Henüz oturum yok" : "No session yet")}</span></div>
+    <div className="production-counter-grid"><div><small>{tr ? "Toplam" : "Total"}</small><strong>{production?.totalCount ?? "—"}</strong></div><div><small>{tr ? "Uygun" : "Pass"}</small><strong>{production?.passCount ?? "—"}</strong></div><div><small>{tr ? "Hatalı" : "Defective"}</small><strong>{production ? rejected : "—"}</strong></div></div>
+    <p>{tr ? "Yerel kamera testi: kararsız sonuçlar hatalı sayısına dahildir. Fiziksel ayırma yapılmaz." : "Local camera test: uncertain results are included in the defective count. No physical rejection is performed."}</p>
   </section>;
 }
-function MetricRow({ events, useAllRecords = false }: { events: InspectionEvent[]; useAllRecords?: boolean }) {
+function MetricRow({ events }: { events: InspectionEvent[] }) {
   const t = useT();
   const { language } = useLanguage();
   const { snapshot, offline, error, mode, now, failuresOnly } = useApp();
@@ -60,6 +60,7 @@ function MetricRow({ events, useAllRecords = false }: { events: InspectionEvent[
       0,
     ) || 0,
   );
+  if (failuresOnly) return <div className="metric-grid single-metric"><MetricCard label={t("FILTERED DEFECT RECORDS")} value={String(m.defective)} unit={t("units")} detail={t("From the available recent records")} negative /></div>;
   return (
     <div className="metric-grid">
       <MetricCard
@@ -76,10 +77,10 @@ function MetricRow({ events, useAllRecords = false }: { events: InspectionEvent[
       />
       <MetricCard
         label={failuresOnly ? t("FAILURE RECORDS RECEIVED") : t("DEFECTIVE PRODUCTS")}
-        value={String(failuresOnly && useAllRecords && snapshot?.summary ? snapshot.summary.legacyFailureRecords + snapshot.summary.cameraDetectionRecords : m.defective)}
+        value={String(m.defective)}
         unit={t("units")}
         detail={
-          failuresOnly ? (useAllRecords ? t("All saved failure records; not a production count") : t("Recent failure records · Includes local camera detections")) : t("Flagged by AI")
+          failuresOnly ? t("Recent failure records · Includes local camera detections") : t("Flagged by AI")
         }
         negative
       />
@@ -121,6 +122,7 @@ export function Overview() {
   );
   const events = snapshot?.events || [];
   const summary = metrics(events);
+  const totalSavedDefects = snapshot?.summary ? snapshot.summary.legacyFailureRecords + snapshot.summary.cameraDetectionRecords : null;
   const chartEnd = Date.parse(snapshot?.updatedAt || "") || 0;
   const stations = snapshot?.stations || [];
   const active = stations.filter(
@@ -162,16 +164,16 @@ export function Overview() {
   return (
     <>
       {mode === "api" && <ProductionSummary />}
-      <div className="context-strip">
+      {mode !== "api" && <div className="context-strip">
         <div>
           <span className={healthy ? "pulse-dot" : "warning-dot"} />
           <strong>
             {failuresOnly
-              ? t("Nivect · Latest failure records")
+              ? t("Recent defect records")
               : t("Production Line 01")}
           </strong>
           <span className="divider" />
-          {petProduct}
+          {t(petProduct)}
         </div>
         <Badge
           tone={
@@ -188,20 +190,20 @@ export function Overview() {
                   ? t("Simulation active")
                   : t("Monitoring active")}
         </Badge>
-      </div>
-      <MetricRow events={events} useAllRecords />
+      </div>}
+      {mode !== "api" && <MetricRow events={events} />}
       <div className="overview-layout">
         <div className="overview-main">
           <section className="panel recommendation-panel">
             <div className="panel-heading">
               <div>
                 <h2>
-                  {failuresOnly ? t("Inspection center") : t("AI inspection center")}{" "}
-                  <span className="count">{summary.total}</span>
+                  {failuresOnly ? t("Saved defect records") : t("AI inspection center")}{" "}
+                  <span className="count">{failuresOnly ? (totalSavedDefects ?? "—") : summary.total}</span>
                 </h2>
                 <p>
                   {failuresOnly
-                    ? t("Recent failures from both sources")
+                    ? t("Total saved defects from both sources; recent records are shown below.")
                     : t("Latest inspections · AI decisions and operator review queue")}
                 </p>
               </div>
@@ -243,7 +245,7 @@ export function Overview() {
               </Link>
             </div>
           </section>
-          <section className="panel quality-panel">
+          {!failuresOnly && <section className="panel quality-panel">
             <div className="panel-heading">
               <div>
                 <h2>{t("Inspection summary")}</h2>
@@ -261,7 +263,7 @@ export function Overview() {
               <div
                 className="quality-ring"
                 style={{
-                  background: `conic-gradient(#0da7e3 ${failuresOnly ? 0 : passRate}%, #dcecf8 0)`,
+                  background: `conic-gradient(var(--quality-fill, #0da7e3) ${failuresOnly ? 0 : passRate}%, var(--quality-track, #dcecf8) 0)`,
                 }}
                 role="img"
                 aria-label={
@@ -298,7 +300,7 @@ export function Overview() {
                 ? t("Production defect rate and model accuracy cannot be calculated from failure-only records.")
                 : t("This is not a model accuracy measurement; labeled ground truth is required.")}
             </p>
-          </section>
+          </section>}
           <section className="panel activity-panel">
             <div className="panel-heading">
               <div>
@@ -344,13 +346,13 @@ export function Overview() {
         <div className="overview-rail">
           <section className="panel health-panel">
             <div className="panel-heading">
-              <h2>{failuresOnly ? t("Backend health") : t("Station health")}</h2>
+              <h2>{failuresOnly ? t("System connection") : t("Station health")}</h2>
               <Cpu size={17} />
             </div>
             <div className="health-headline">
               <small>
                 {failuresOnly
-                  ? t("SPRING BOOT / ACTUATOR")
+                  ? t("DATA SERVICE")
                   : t("TOTAL PROCESSING SPEED")}
               </small>
               <div>
@@ -360,7 +362,7 @@ export function Overview() {
                     : offline || error
                       ? "—"
                       : totalFps}
-                  <span>{failuresOnly ? t("HTTP") : t("FPS")}</span>
+                  {!failuresOnly && <span>{t("FPS")}</span>}
                 </strong>
                 <Badge
                   tone={
@@ -381,7 +383,7 @@ export function Overview() {
               </div>
               <p>
                 {failuresOnly
-                  ? t("Backend health does not verify camera or model health.")
+                  ? t("Connection status does not verify camera or model readiness.")
                   : t("Camera and inference connection status")}
               </p>
             </div>
@@ -992,7 +994,7 @@ export function Settings() {
           <strong>
             {mode === "demo"
               ? t("Local simulation")
-              : t("Live API (Nivect contract)")}
+              : t("Live data source")}
           </strong>
         </p>
         <div className="notice">
@@ -1019,7 +1021,7 @@ export function Settings() {
         </button>
         <hr />
         <h3>{t("Integration scope")}</h3>
-        <p className="muted">{t("The Nivect Spring Boot address is configured through the development proxy (default port 8080). Approved APIs for user management, camera configuration, and model updates are not available.")}{' '}</p>
+        <p className="muted">{t("User management, camera settings, and model updates are not available yet.")}{' '}</p>
         <Badge tone="warning">{t("Advanced configuration unavailable")}</Badge>
         <p className="muted">{t("OCR / batch and expiry date inspection: Phase 2.")}{' '}</p>
       </section>

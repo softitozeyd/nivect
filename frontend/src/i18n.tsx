@@ -3,6 +3,20 @@ import type { ReactNode } from "react";
 
 export type Language = "tr" | "en";
 const turkish: Record<string, string> = {
+  "LIVE DATA": "CANLI VERİ",
+  "Saved defect records": "Kayıtlı hatalar",
+  "Total saved defects from both sources; recent records are shown below.": "İki kaynaktaki toplam kayıtlı hata sayısı; aşağıda son kayıtlar gösterilir.",
+  "FILTERED DEFECT RECORDS": "FİLTRELENEN HATALI KAYITLAR",
+  "From the available recent records": "Erişilebilen son kayıtlar içinden",
+  "Live data": "Canlı veriler",
+  "Live data source": "Canlı veri kaynağı",
+  "Latest inspection records": "Son inceleme kayıtları",
+  "Recent defect records": "Son hatalı kayıtlar",
+  "Recorded defects are shown; production totals across all lines are unavailable.": "Kaydedilen hatalar gösteriliyor; tüm hatların toplam üretim bilgisi henüz sunulmuyor.",
+  "System connection": "Sistem bağlantısı",
+  "DATA SERVICE": "VERİ HİZMETİ",
+  "Connection status does not verify camera or model readiness.": "Bağlantı durumu, kamera veya modelin hazır olduğunu doğrulamaz.",
+  "User management, camera settings, and model updates are not available yet.": "Kullanıcı yönetimi, kamera ayarları ve model güncellemeleri henüz sunulmuyor.",
   "Production session": "Üretim oturumu", "Product number": "Ürün sıra numarası",
   "Uncertain": "Kararsız",
   "Open camera": "Kamerayı aç",
