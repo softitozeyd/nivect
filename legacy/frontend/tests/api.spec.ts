@@ -52,7 +52,7 @@ test("real Nivect routes recover from HTTP errors and expose exact failure check
   );
   await expect(
     page.getByRole("button", { name: "Save review" }),
-  ).toBeDisabled();
+  ).toBeEnabled();
   expect(writes).toEqual([]);
 });
 test("failure-only coverage never implies total production, 100 percent defects or camera FPS", async ({

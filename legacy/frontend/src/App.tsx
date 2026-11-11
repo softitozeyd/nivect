@@ -14,7 +14,6 @@ import {
   Menu,
   X,
   ShieldCheck,
-  ChevronDown,
 } from "lucide-react";
 import { useApp } from "./store";
 import { backendOffset } from "./services/nivect";
@@ -123,7 +122,7 @@ export default function App() {
               </select>
             </label>
             <span className="demo-mode">
-              {mode === "demo" ? t("DEMO MODE · SIMULATED DATA") : t("LIVE API MODE")}
+              {mode === "demo" ? t("DEMO MODE · SIMULATED DATA") : t("LIVE DATA")}
             </span>
             <button
               className="icon-button notification-button"
@@ -162,7 +161,7 @@ export default function App() {
                 {offline || error
                   ? t("Data connection lost. The latest data may be out of date.")
                   : mode === "api"
-                    ? t("Latest failure records: {count}. Operator reviews are unavailable.").replace("{count}", String(pendingReviews))
+                    ? t("Recent failure records awaiting review: {count}.").replace("{count}", String(pendingReviews))
                     : pendingReviews
                       ? t("There are {count} unreviewed AI defect predictions in this session. Review them in Inspection History.").replace("{count}", String(pendingReviews))
                       : t("There are no unreviewed AI defect predictions in this session.")}
@@ -183,17 +182,17 @@ export default function App() {
               <h1>{t(current?.label || "Page not found")}</h1>
               <p>
                 {mode === "api" && location.pathname === "/monitoring"
-                  ? t("View the latest available failure record.")
+                  ? t("Use your local camera and view model predictions.")
                   : mode === "api" && location.pathname === "/history"
                     ? t("Find and inspect recent inspection records.")
                     : t(descriptions[location.pathname] || "")}
               </p>
             </div>
             <div className="heading-actions">
+              {location.pathname === "/" && <Link className="overview-shortcut" to="/monitoring"><Camera size={15}/>{t("Open camera")}</Link>}
               <span className="line-button" title={t("MVP: one production line")}>
                 <Camera size={14} />{" "}
-                {mode === "demo" ? t("Production Line 01") : t("Nivect · All lines")}{" "}
-                <ChevronDown size={13} />
+                {mode === "demo" ? t("Production Line 01") : t("All lines")}
               </span>
               <span className="date-label">
                 <CalendarDays size={14} />
@@ -234,9 +233,9 @@ export default function App() {
             <div className="notice api-scope-banner">
               <Activity size={16} />
               <div>
-                <strong>{t(location.pathname === "/history" ? "Nivect / Spring Boot · Latest 100 inspections" : "Nivect / Spring Boot · Latest 20 failures")}</strong>
-                <p>{t(location.pathname === "/history" ? "History shows the latest 100 saved records. Total production, FPS, camera health, model confidence and image access are unavailable. Assumed backend UTC offset:" : "This API provides FAIL records only. Total production, overall defect rate, FPS, camera health, model confidence, and image access are unavailable. No failure records does not mean production has stopped. Assumed backend UTC offset:")}{" "}
-                  {backendOffset}{' '}{t("(the API provides no time zone).")}{' '}</p>
+                <strong>{t(location.pathname === "/history" ? "Latest inspection records" : "Recent defect records")}</strong>
+                <p>{t(location.pathname === "/history" ? "Showing the latest 100 inspection records." : "Recorded defects are shown; production totals across all lines are unavailable.")}</p>
+                <details className="scope-details"><summary>{t("About this data")}</summary><p>{t(location.pathname === "/history" ? "History shows the latest 100 saved records. Total production, FPS, camera health, model confidence and image access are unavailable. Assumed backend UTC offset:" : "The overview and reports show recent failure records, including local camera detections. They do not represent total production or a defect rate. FPS, station health, and saved images are unavailable. Assumed backend UTC offset:")}{" "}{backendOffset}{' '}{t("(the API provides no time zone).")}</p></details>
               </div>
             </div>
           )}
@@ -258,7 +257,7 @@ export default function App() {
                 : t("No data received yet")}
             </span>
             <span className="source-caption">
-              {mode === "demo" ? t("Local demo environment") : t("API environment")} ·{" "}
+              {mode === "demo" ? t("Local demo environment") : t("Live data")} ·{" "}
               {health === "active"
                 ? t("Data source reachable")
                 : t("Check your connection")}
@@ -298,7 +297,7 @@ export default function App() {
               </div>
             </details>
             <span>{t("MVP 1.0")}{' '}<span className="divider" />
-              {mode === "demo" ? t("Simulation environment") : t("API environment")}
+              {mode === "demo" ? t("Simulation environment") : t("Live data")}
             </span>
           </footer>
         </main>

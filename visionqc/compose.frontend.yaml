@@ -1,0 +1,14 @@
+# Build the VisionQC panel against its compatible local backend.
+services:
+  frontend:
+    profiles: [app]
+    build:
+      context: ../legacy/frontend
+      args:
+        VISIONQC_BUILD_MODE: api
+    ports:
+      - "127.0.0.1:5197:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped

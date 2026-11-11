@@ -112,12 +112,12 @@ function useStore() {
     return () => clearTimeout(timer);
   }, [toast]);
   async function review(id: string, value: OperatorReview) {
-    if (mode !== "demo" || offline || error)
-      throw new Error("Restore the demo connection to submit a review.");
+    if (offline || error)
+      throw new Error("Restore the connection to submit a review.");
     await adapter.review(id, value);
     await refresh();
     if (preferences.notifications)
-      setToast("Operator review saved to the demo session.");
+      setToast(mode === "demo" ? "Operator review saved to the demo session." : "Review saved.");
   }
   return {
     snapshot,

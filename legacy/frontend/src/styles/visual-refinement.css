@@ -1,0 +1,145 @@
+/* VisionQC operator interface: existing layout with clearer contrast and controls. */
+.cloud-shell {
+  --teal: #43c99c;
+  --navy: #ecf5f3;
+  --muted: #a9b9bf;
+  --border: #293941;
+  --shadow: 0 8px 24px #00000020;
+  --quality-fill: #42c992;
+  --quality-track: #29433d;
+  color: #e6eeef;
+  background: #0b1117;
+  color-scheme: dark;
+}
+.cloud-shell .brand { color: #f2f7f5; }
+.cloud-shell .brand-mark { color: #08271d; background: #43d09f; }
+.cloud-shell .top-navigation { background: #101a21; border-color: #29363f; box-shadow: 0 5px 16px #00000025; }
+.cloud-shell .top-navigation a { color: #b6c4c8; }
+.cloud-shell .top-navigation a:hover { color: #edf8f4; background: #1c2b30; }
+.cloud-shell .top-navigation a.active,
+.cloud-shell .top-navigation a.active:hover { color: #f4fbf8; background: #2a3a40; }
+.cloud-shell .topbar-right .icon-button,
+.cloud-shell .menu-button { color: #bdcbcc; background: #142128; border-color: #2c3c43; }
+.cloud-shell .topbar-right .icon-button:hover,
+.cloud-shell .menu-button:hover { color: #eafff5; background: #20363b; }
+.cloud-shell .language-switch select,
+.cloud-shell input, .cloud-shell select, .cloud-shell textarea {
+  color: #e4eeeb; background: #162229; border-color: #34454b;
+}
+.cloud-shell input::placeholder, .cloud-shell textarea::placeholder { color: #93a7a9; }
+.cloud-shell label, .cloud-shell .filters label { color: #b1c4be; }
+.cloud-shell .toggle-row strong { color: #e1efe7; }
+.cloud-shell .demo-mode { color: #8ce4be; background: #12342d; border-color: #245246; }
+.cloud-shell .avatar.small { border-color: #24383d; background: #31515b; }
+.cloud-shell .profile-dot { border-color: #18272c; }
+.cloud-shell .page-heading .eyebrow { color: #9aafb0; }
+.cloud-shell h1, .cloud-shell h2, .cloud-shell h3,
+.cloud-shell .panel-heading h2, .cloud-shell .panel h2 { color: #eff6f4; }
+.cloud-shell .page-heading p, .cloud-shell .panel-heading p,
+.cloud-shell .freshness, .cloud-shell .freshness .source-caption { color: #a5b7b8; }
+.cloud-shell .line-button, .cloud-shell .date-label { color: #c7d6d2; background: #17242b; border: 1px solid #2d3c43; }
+.cloud-shell .api-scope-banner, .cloud-shell .demo-disclaimer {
+  background: #112622; border: 1px solid #29483d; color: #b5d5c5;
+}
+.cloud-shell .api-scope-banner p, .cloud-shell .scope-details p { color: #a7c4b5; }
+.cloud-shell .notice:not(.api-scope-banner):not(.error), .cloud-shell .info-note {
+  background: #1a302b; color: #c1dbce; border-color: #345249;
+}
+.cloud-shell .notice.error { background: #47242d; color: #ffced4; border-color: #874653; }
+.cloud-shell .scope-details summary, .cloud-shell .text-link,
+.cloud-shell .camera-recent a { color: #70ddae; }
+.cloud-shell .panel, .cloud-shell .metric { background: #111c22; border: 1px solid #293b40; box-shadow: 0 8px 24px #00000018; }
+.cloud-shell .panel-heading { border-color: #283a3e; }
+.cloud-shell .panel p, .cloud-shell .panel small { color: #a8bab8; }
+.cloud-shell .metric .eyebrow { color: #aababc; }
+.cloud-shell .metric-value { color: #f1f7f4; }
+.cloud-shell .metric-value > span { color: #adbfbd; }
+.cloud-shell .metric-detail.positive { color: #79d7aa; }
+.cloud-shell .metric-detail.danger { color: #ef9baa; }
+.cloud-shell .context-strip { color: #b4c8c0; background: #13251f; border: 1px solid #28473b; }
+.cloud-shell .context-strip strong { color: #e1f4e9; }
+.cloud-shell .production-counters, .cloud-shell .production-overview { border-color: #293b3c; }
+.cloud-shell .production-counters-heading { color: #edf8f0; }
+.cloud-shell .production-counters-heading span,
+.cloud-shell .production-counters p, .cloud-shell .production-overview p { color: #a7beb1; }
+.cloud-shell .production-counter-grid > div { background: #182a29; border-color: #304a42; }
+.cloud-shell .production-counter-grid small { color: #a8c4b8; }
+.cloud-shell .production-counter-grid strong { color: #f1faf4; }
+.cloud-shell button { background: #1a292e; color: #d7e7e1; border-color: #364a4c; }
+.cloud-shell button:hover { background: #253b3a; border-color: #4c7265; color: #f2faf6; }
+.cloud-shell button:disabled { opacity: .58; }
+.cloud-shell .primary, .cloud-shell .overview-shortcut { color: #072c20; background: #49d19f; border-color: #49d19f; }
+.cloud-shell .primary:hover, .cloud-shell .overview-shortcut:hover { color: #05291d; background: #72e5b7; border-color: #72e5b7; }
+.cloud-shell .camera-actions .camera-record { color: #d7e7df; background: #1a292e; border-color: #405652; }
+.cloud-shell .camera-actions .camera-record:not(:disabled):hover { background: #29423a; }
+.cloud-shell .camera-actions .camera-record.is-recording { color: #ffccd0; background: #502730; border-color: #91515d; }
+.cloud-shell .segmented-control { background: #1b2a30; border-color: #31434a; }
+.cloud-shell .segmented-control button { color: #b7c9c7; background: transparent; border-color: transparent; }
+.cloud-shell .segmented-control button[aria-pressed="true"] { background: #dcece5; color: #122c23; }
+.cloud-shell .segmented-control button:hover { background: #30463f; color: #f4fff9; }
+.cloud-shell .segmented-control button[aria-pressed="true"]:hover { background: #f0fff6; color: #122c23; }
+.cloud-shell .badge.success { color: #9be5b9; background: #12382c; border-color: #285d45; }
+.cloud-shell .badge.danger { color: #ffb5be; background: #4a222c; border-color: #793b4a; }
+.cloud-shell .badge.warning { color: #f6d18d; background: #41341f; border-color: #6b5836; }
+.cloud-shell .badge.neutral, .cloud-shell .soft-label, .cloud-shell .count { color: #becfcb; background: #213137; border-color: #36484c; }
+.cloud-shell th { background: #1b292f; color: #aebfbd; border-color: #314147; }
+.cloud-shell td { color: #d8e7e0; border-color: #2a3b3e; }
+.cloud-shell td small, .cloud-shell .event-product > div { color: #aabeb6; }
+.cloud-shell .event-id { color: #77dab2; }
+.cloud-shell tbody tr:hover { background: #1b2d30; }
+.cloud-shell .camera-panel-header, .cloud-shell .camera-recent,
+.cloud-shell .camera-recent-list > div, .cloud-shell .camera-divider { border-color: #2c403e; }
+.cloud-shell .camera-heading-icon, .cloud-shell .camera-result-icon { color: #9aebc5; background: #1e4036; border-color: #315a49; box-shadow: none; }
+.cloud-shell .camera-kicker, .cloud-shell .camera-result-label { color: #9cb6aa; }
+.cloud-shell .camera-heading p, .cloud-shell .camera-hint,
+.cloud-shell .camera-result p, .cloud-shell .camera-steps p,
+.cloud-shell .camera-recent p, .cloud-shell .camera-recent time { color: #a9beb2; }
+.cloud-shell .camera-sidebar { background: #162629; border-color: #304544; }
+.cloud-shell .camera-result strong, .cloud-shell .camera-steps h3,
+.cloud-shell .camera-recent h3, .cloud-shell .camera-recent-list strong { color: #e5f2eb; }
+.cloud-shell .camera-steps > div > span { color: #b8e7cd; border-color: #496d5a; }
+.cloud-shell .camera-disclaimer { background: #1d342c; color: #acc9b9; }
+.cloud-shell .camera-state { background: #263330; color: #c4d2ca; border-color: #40534a; }
+.cloud-shell .camera-state.online { background: #143a2c; color: #a0e8bf; border-color: #2c6449; }
+.cloud-shell .record-indicator { color: #b8c8bf; }
+.cloud-shell .record-indicator.is-recording { color: #ffadb7; }
+.cloud-shell .empty, .cloud-shell .empty p, .cloud-shell .empty h3 { color: #aabdb8; }
+.cloud-shell .chart-wrap .legend, .cloud-shell .chart-wrap .legend small,
+.cloud-shell .chart-bottom { color: #a7bcb6; }
+.cloud-shell .chart-wrap svg text { fill: #b5c8c0; }
+.cloud-shell .chart-wrap svg rect { stroke: #334743; }
+.cloud-shell .health-headline strong { color: #e8f5ee; }
+.cloud-shell .health-headline strong > span,
+.cloud-shell .health-headline > small { color: #a9c0b4; }
+.cloud-shell .health-meter { background: #263d38; }
+.cloud-shell .health-meter span { background: #4dcc9c; }
+.cloud-shell .preview-link { color: #72ddb0; }
+.cloud-shell .quality-ring { border-color: #233a34; box-shadow: 0 0 0 3px #365a4c; }
+.cloud-shell .quality-ring > div { background: #142721; box-shadow: 0 0 0 4px #182d25; }
+.cloud-shell .quality-ring strong { color: #edf9f2; }
+.cloud-shell .quality-ring small, .cloud-shell .quality-ring > div > span { color: #a6c4b5; }
+.cloud-shell .ring-chip { background: #1e3930; border-color: #345e4a; color: #bce8ce; }
+.cloud-shell .quality-bottom { color: #a5bfb2; }
+.cloud-shell .recommendation-action.review, .cloud-shell .attention-action { color: #ffc7d1; background: #632b3c; border-color: #8c4359; }
+.cloud-shell .recommendation-action.pass { color: #a8eed0; background: #174536; border-color: #2c6c52; }
+.cloud-shell .notification-popover, .cloud-shell dialog {
+  color: #e2f0e9; background: #16252a; border: 1px solid #3a504b;
+}
+.cloud-shell dialog::backdrop { background: #040b0dc9; }
+.cloud-shell dialog .notice { color: #d1e3d9; background: #20382f; border-color: #3e6250; }
+.cloud-shell .notification-popover p, .cloud-shell dialog p,
+.cloud-shell dialog label, .cloud-shell dialog small { color: #b9cdc2; }
+.cloud-shell .setting-row, .cloud-shell .station-mini,
+.cloud-shell .system-foot, .cloud-shell .safety-note { color: #bfd1c9; border-color: #314541; }
+.cloud-shell .station-mini strong, .cloud-shell .system-foot strong { color: #edf8f1; }
+.cloud-shell .station-mini small, .cloud-shell footer { color: #a3b9b0; }
+.cloud-shell .station-icon { color: #9ce6bb; background: #1a3f30; }
+.cloud-shell :is(button, a, select, input, textarea, summary):focus-visible { outline: 3px solid #78e4b4; outline-offset: 3px; }
+@media (max-width: 1120px) {
+  .cloud-shell .top-navigation.open { background: #142329; border-color: #344b46; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .cloud-shell :is(button, .top-navigation a, .metric, .panel) { transition: background-color .18s ease, border-color .18s ease, box-shadow .18s ease; }
+  .cloud-shell :is(button, .top-navigation a):not(:disabled) svg { transition: transform .18s ease; }
+  .cloud-shell :is(button, .top-navigation a):not(:disabled):hover svg { transform: translateY(-1px); }
+}
