@@ -48,10 +48,11 @@ class Handler(BaseHTTPRequestHandler):
             self.headers_for(403); self.wfile.write(b'{}'); return
         try:
             size = int(self.headers.get('Content-Length', '0'))
-            if not 0 < size <= 2_000_000: raise ValueError('Invalid image size')
+            if not 0 < size <= 8_000_000: raise ValueError('Invalid image size')
             frame = cv2.imdecode(np.frombuffer(self.rfile.read(size), np.uint8), cv2.IMREAD_COLOR)
             if frame is None: raise ValueError('Invalid image')
             h, w = frame.shape[:2]
+            if max(h, w) > 1280: raise ValueError('Image dimensions exceed limit')
             with inference_lock:
                 result = model.predict(frame, imgsz=960, conf=.15, device=device, verbose=False, max_det=30)[0]
             detections = [{'name': expected[int(c)], 'confidence': float(p), 'box': [float(v) for v in xy]}

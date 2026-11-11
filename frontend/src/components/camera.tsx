@@ -66,9 +66,9 @@ export function CameraPanel() {
         const scale = Math.min(1, 1280 / Math.max(v.videoWidth, v.videoHeight));
         canvas.width = Math.round(v.videoWidth * scale); canvas.height = Math.round(v.videoHeight * scale);
         canvas.getContext('2d')?.drawImage(v, 0, 0, canvas.width, canvas.height);
-        const blob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, 'image/jpeg', .8));
+        const blob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, 'image/png'));
         if (!blob || id !== session.current) break;
-        const response = await fetch('http://127.0.0.1:8765/predict', {method: 'POST', headers: {'Content-Type': 'image/jpeg'}, body: blob, signal: AbortSignal.timeout(30000)});
+        const response = await fetch('http://127.0.0.1:8765/predict', {method: 'POST', headers: {'Content-Type': 'image/png'}, body: blob, signal: AbortSignal.timeout(30000)});
         if (!response.ok) throw new Error('model');
         const result = await response.json() as Prediction;
         if (id !== session.current) break;
