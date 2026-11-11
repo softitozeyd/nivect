@@ -1,0 +1,927 @@
+/* Reference motion: forest label + detached sage circle -> inset square. */
+:root {
+  --action-surface: var(--green, #2f4935);
+  --action-accent: #b6c69d;
+  --action-on-accent: #263c2b;
+  --action-focus: #637a50;
+  --action-text: var(--cream, #f1f0e6);
+  --action-ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+.action.action {
+  --control-size: 44px;
+  --control-gap: 7px;
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--control-gap);
+  min-height: var(--control-size);
+  height: auto;
+  width: max-content;
+  max-width: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--action-text);
+  text-decoration: none;
+  text-underline-offset: 0;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.4;
+  letter-spacing: 0;
+  white-space: normal;
+  vertical-align: middle;
+  transform: none;
+  transition: opacity 0.2s ease;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.action::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0 calc(var(--control-size) + var(--control-gap)) 0 0;
+  background: var(--action-surface);
+  transition: right 0.5s var(--action-ease);
+}
+.action .action-label {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 0;
+  min-height: var(--control-size);
+  padding: 11px 20px;
+  color: inherit;
+  font-size: inherit;
+  font-family: inherit;
+  font-style: normal;
+  line-height: inherit;
+  letter-spacing: inherit;
+  text-align: center;
+  transition: transform 0.5s var(--action-ease);
+}
+.action .action-orb {
+  display: grid;
+  place-items: center;
+  flex: 0 0 var(--control-size);
+  width: var(--control-size);
+  height: var(--control-size);
+  padding: 0;
+  margin: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--action-accent);
+  color: var(--action-on-accent);
+  transform-origin: center;
+  transition:
+    transform 0.5s var(--action-ease),
+    border-radius 0.5s var(--action-ease);
+  pointer-events: none;
+}
+.action .action-orb > svg {
+  width: 18px;
+  height: 18px;
+  stroke-width: 1.6;
+}
+.action:not(:disabled):is(:hover, :focus-visible)::before {
+  right: 0;
+}
+.action:not(:disabled):is(:hover, :focus-visible) .action-orb {
+  border-radius: 0;
+  transform: translateX(-6px) scale(0.76);
+}
+.action:not(:disabled):active .action-orb {
+  transform: translateX(-6px) scale(0.69);
+}
+.action:focus-visible {
+  outline: 2px solid var(--action-focus);
+  outline-offset: 5px;
+}
+.action:disabled {
+  opacity: 0.36;
+  cursor: not-allowed;
+}
+.action:disabled::before,
+.action:disabled .action-orb {
+  transition: none;
+}
+.action.action-icon {
+  width: var(--control-size);
+  height: var(--control-size);
+  min-width: var(--control-size);
+  padding: 0;
+  justify-content: center;
+  gap: 0;
+  background: transparent;
+}
+.action.action-icon::before {
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+.action.action-icon:not(:disabled):is(:hover, :focus-visible)::before {
+  opacity: 1;
+}
+.action.action-icon:not(:disabled):is(:hover, :focus-visible) .action-orb {
+  transform: scale(0.76);
+}
+.action.action-icon:not(:disabled):active .action-orb {
+  transform: scale(0.69);
+}
+.action.full {
+  width: 100%;
+}
+.action.full .action-label {
+  flex: 1;
+}
+.action.pill {
+  --control-size: 48px;
+  font-size: 12px;
+}
+.action.nav-cta {
+  --control-size: 40px;
+  font-size: 10px;
+}
+.action.nav-cta .action-label {
+  padding-inline: 17px;
+}
+.action.nav-link {
+  --control-size: 30px;
+  --control-gap: 5px;
+  font-size: 10px;
+}
+.action.nav-link .action-label {
+  padding: 7px 12px;
+}
+.site-nav nav {
+  gap: 12px;
+}
+.site-nav nav a {
+  color: var(--action-text);
+}
+.hero .action.pill {
+  --control-size: 48px;
+}
+.hero-bottom > .action {
+  --control-size: 32px;
+  font-size: 10px;
+  gap: var(--control-gap);
+  letter-spacing: 0;
+}
+.hero-bottom > .action .action-label {
+  padding-inline: 13px;
+}
+.hero-bottom > .action .action-orb > svg {
+  width: 14px;
+  height: 14px;
+}
+.action.motion-toggle {
+  --control-size: 32px;
+  position: absolute;
+  bottom: 86px;
+  right: 38px;
+  z-index: 2;
+  border: 0;
+  backdrop-filter: none;
+  font-size: 9px;
+  gap: var(--control-gap);
+  padding: 0;
+  border-radius: 0;
+  color: var(--action-text);
+}
+.action.motion-toggle .action-label {
+  padding: 8px 12px;
+}
+.action.motion-toggle .action-orb > svg {
+  width: 13px;
+  height: 13px;
+}
+.action.text-link {
+  --control-size: 34px;
+  font-size: 11px;
+}
+.action.text-link .action-label {
+  padding: 8px 13px;
+}
+.faq-item {
+  border-bottom: 0;
+  margin: 0 0 12px;
+}
+.faq-item > .action {
+  --control-size: 52px;
+  width: 100%;
+  min-height: 52px;
+  margin: 0;
+  font-size: 12px;
+  text-align: left;
+}
+.faq-item > .action .action-label {
+  flex: 1;
+  justify-content: flex-start;
+  text-align: left;
+  padding: 16px 19px;
+  line-height: 1.65;
+}
+.faq-item p {
+  margin: 0 59px 0 0;
+  padding: 18px 20px 22px;
+  background: #eeeee6;
+  max-width: none;
+  color: #707769;
+  font-size: 11px;
+}
+.faq-item.active > .action::before {
+  right: 0;
+}
+.faq-item.active > .action .action-orb {
+  border-radius: 0;
+  transform: translateX(-6px) scale(0.76);
+}
+.footer > .action {
+  --control-size: 32px;
+  font-size: 9px;
+  gap: var(--control-gap);
+  color: var(--action-text);
+}
+.footer > .action .action-label {
+  padding: 8px 12px;
+}
+.feature-icon {
+  background: var(--action-accent);
+  color: var(--action-on-accent);
+  border: 0;
+  transition:
+    transform 0.5s var(--action-ease),
+    border-radius 0.5s var(--action-ease);
+}
+.feature-card:hover .feature-icon {
+  border-radius: 0;
+  transform: scale(0.84);
+}
+/* Same geometry at compact workspace sizes, without changing control semantics. */
+.workspace .action {
+  --control-size: 34px;
+  --control-gap: 5px;
+  font-size: 10px;
+}
+.workspace .action .action-label {
+  padding: 9px 12px;
+}
+.workspace .heading-actions .action {
+  --control-size: 36px;
+}
+.workspace .heading-actions .action .action-orb > svg {
+  width: 15px;
+  height: 15px;
+}
+.sidebar nav .action {
+  --control-size: 33px;
+  --control-gap: 6px;
+  display: flex;
+  width: 100%;
+  margin: 0 0 5px;
+  padding: 0;
+  color: var(--action-text);
+  background: transparent;
+  border-radius: 0;
+  font-size: 10px;
+}
+.sidebar nav .action .action-label {
+  flex: 1;
+  justify-content: flex-start;
+  text-align: left;
+  padding: 11px 12px;
+  min-height: 42px;
+}
+.sidebar nav .action::before {
+  opacity: 0.9;
+}
+.sidebar nav .action.selected::before {
+  right: 0;
+  opacity: 1;
+}
+.sidebar nav .action.selected .action-orb {
+  border-radius: 0;
+  transform: translateX(-6px) scale(0.76);
+}
+.sidebar nav .nav-dot {
+  margin: 0 0 0 auto;
+  background: #e7c09e;
+}
+.sidebar nav .nav-dot.ready {
+  background: #a8c97d;
+}
+.sidebar-bottom > .action {
+  --control-size: 29px;
+  display: flex;
+  width: 100%;
+  margin: 8px 0;
+  padding: 0;
+  color: var(--action-text);
+  background: transparent;
+}
+.sidebar-bottom > .action .action-label {
+  padding: 8px 12px;
+  flex: 1;
+  justify-content: flex-start;
+  font-size: 9px;
+}
+.sidebar-bottom .action-orb > svg {
+  width: 14px;
+  height: 14px;
+}
+.action.mobile-menu {
+  display: none;
+}
+.action.icon-btn {
+  --control-size: 30px;
+}
+.modal .action.icon-btn {
+  --control-size: 32px;
+}
+.model-banner > .action {
+  --control-size: 32px;
+  flex-shrink: 0;
+  margin-left: auto;
+  color: var(--action-text);
+  font-size: 10px;
+}
+.model-banner .action-label {
+  margin: 0;
+  padding: 9px 11px;
+  color: inherit;
+  font-size: inherit;
+}
+.model-banner .action-orb {
+  margin: 0;
+}
+.records-panel .action.icon-btn {
+  --control-size: 27px;
+}
+.table-footer .action.icon-btn {
+  --control-size: 29px;
+}
+.camera-controls .action {
+  --control-size: 35px;
+}
+.empty > .action {
+  margin-top: 7px;
+}
+.error > .action {
+  --control-size: 29px;
+  font-size: 9px;
+}
+.error > .action .action-label {
+  padding: 7px 10px;
+}
+.toast .action.icon-btn {
+  --control-size: 27px;
+}
+.modal .action.full {
+  --control-size: 46px;
+}
+.form-stack > .action {
+  width: 100%;
+  --control-size: 44px;
+}
+.form-stack > .action .action-label {
+  flex: 1;
+}
+.select-control {
+  --control-size: 34px;
+  --control-gap: 5px;
+  position: relative;
+  isolation: isolate;
+  display: inline-grid;
+  vertical-align: middle;
+  max-width: 100%;
+  min-width: 0;
+  min-height: var(--control-size);
+  color: var(--action-text);
+  font-size: 10px;
+}
+.select-control::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0 calc(var(--control-size) + var(--control-gap)) 0 0;
+  background: var(--action-surface);
+  transition: right 0.5s var(--action-ease);
+}
+.select-control > select {
+  position: relative;
+  z-index: 1;
+  display: block;
+  appearance: none;
+  -webkit-appearance: none;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  min-height: var(--control-size);
+  border: 0;
+  border-radius: 0;
+  padding: 9px calc(var(--control-size) + var(--control-gap) + 12px) 9px 12px;
+  color: inherit;
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
+}
+.select-control option {
+  color: var(--action-text);
+  background: var(--action-surface);
+}
+.select-orb {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: var(--control-size);
+  height: var(--control-size);
+  background: var(--action-accent);
+  color: var(--action-on-accent);
+  border-radius: 50%;
+  pointer-events: none;
+  transform: translateY(-50%);
+  transition:
+    transform 0.5s var(--action-ease),
+    border-radius 0.5s var(--action-ease);
+}
+.select-control:not(.is-disabled):is(:hover, :focus-within)::before {
+  right: 0;
+}
+.select-control:not(.is-disabled):is(:hover, :focus-within) .select-orb {
+  border-radius: 0;
+  transform: translate(-5px, -50%) scale(0.76);
+}
+.select-control:focus-within {
+  outline: 2px solid var(--action-focus);
+  outline-offset: 4px;
+}
+.select-control > select:focus-visible {
+  outline: 0;
+}
+.select-control.is-disabled {
+  opacity: 0.4;
+}
+.camera-side .select-control {
+  width: 100%;
+}
+.filter-bar > div {
+  min-width: 0;
+}
+.filter-bar .select-control {
+  max-width: 220px;
+}
+.records-panel .select-control {
+  max-width: 180px;
+}
+input:not([type="checkbox"]):not([type="range"]) {
+  border-radius: 0;
+  border-color: #d1d2c8;
+  transition:
+    border-color 0.25s,
+    box-shadow 0.25s;
+}
+input:not([type="checkbox"]):not([type="range"]):is(:hover, :focus) {
+  border-color: var(--action-focus);
+}
+input:focus-visible {
+  outline: 2px solid var(--action-focus);
+  outline-offset: 3px;
+}
+input[type="checkbox"],
+.checkbox-label input,
+.form-stack input[type="range"] {
+  accent-color: var(--action-accent);
+}
+.action[aria-pressed="true"]::before {
+  right: 0;
+}
+.action[aria-pressed="true"] .action-orb {
+  border-radius: 0;
+  transform: translateX(-6px) scale(0.76);
+}
+@media (max-width: 1100px) {
+  .site-nav nav {
+    gap: 7px;
+  }
+  .action.nav-link {
+    font-size: 9px;
+    --control-size: 27px;
+  }
+  .action.nav-link .action-label {
+    padding-inline: 9px;
+  }
+  .heading-actions {
+    gap: 6px;
+  }
+  .workspace .heading-actions .action .action-label {
+    padding-inline: 10px;
+  }
+}
+@media (max-width: 800px) {
+  .action.mobile-menu {
+    display: inline-flex;
+  }
+  .action.motion-toggle {
+    right: 25px;
+    bottom: 80px;
+  }
+  .workspace-top {
+    height: 70px;
+  }
+  .select-control {
+    font-size: 9px;
+  }
+}
+@media (max-width: 580px) {
+  .action.nav-cta {
+    --control-size: 32px;
+    font-size: 9px;
+  }
+  .action.nav-cta .action-label {
+    padding: 9px 10px;
+  }
+  .action.pill {
+    --control-size: 44px;
+  }
+  .hero .action.pill {
+    --control-size: 44px;
+  }
+  .hero-bottom > .action {
+    --control-size: 28px;
+    font-size: 9px;
+  }
+  .hero-bottom > .action:after {
+    content: none;
+  }
+  .hero-bottom > .action .action-label {
+    padding: 8px 10px;
+  }
+  .action.motion-toggle {
+    --control-size: 30px;
+    bottom: 26px;
+    right: 20px;
+  }
+  .action.motion-toggle .action-label {
+    display: none;
+  }
+  .action.motion-toggle {
+    width: var(--control-size);
+    gap: 0;
+  }
+  .action.motion-toggle::before {
+    inset: 0;
+    opacity: 0;
+  }
+  .action.motion-toggle:hover::before {
+    opacity: 1;
+  }
+  .action.motion-toggle .action-orb {
+    display: grid;
+  }
+  .action.motion-toggle:is(:hover, :focus-visible) .action-orb,
+  .action.motion-toggle[aria-pressed="true"] .action-orb {
+    transform: scale(0.76);
+  }
+  .faq-item > .action {
+    --control-size: 45px;
+    font-size: 11px;
+  }
+  .faq-item > .action .action-label {
+    padding: 14px;
+    min-height: 56px;
+  }
+  .faq-item p {
+    margin-right: 52px;
+    padding: 17px 14px;
+    font-size: 11px;
+  }
+  .model-banner > .action {
+    margin-left: 0;
+    margin-top: 6px;
+  }
+  .filter-bar {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .filter-bar > div {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .filter-bar .select-control {
+    max-width: none;
+    flex: 1;
+    min-width: 180px;
+  }
+  .filter-bar input {
+    flex: 1;
+    max-width: none;
+    min-width: 100px;
+  }
+  .filter-bar > .select-control {
+    flex: initial;
+    min-width: 0;
+    width: 168px;
+  }
+  .workspace .heading-actions .action {
+    --control-size: 34px;
+    font-size: 10px;
+  }
+  .workspace .heading-actions .action .action-label {
+    padding-inline: 12px;
+  }
+  .camera-controls .action {
+    --control-size: 34px;
+    font-size: 9px;
+  }
+  .camera-controls .action .action-label {
+    padding-inline: 10px;
+  }
+  .records-panel .select-control {
+    max-width: 158px;
+  }
+  .footer > .action {
+    display: inline-flex;
+  }
+  .footer > a:first-child {
+    margin-right: auto;
+  }
+  .toast {
+    gap: 7px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .action::before,
+  .action .action-orb,
+  .action .action-label,
+  .select-control::before,
+  .select-orb,
+  .feature-icon {
+    transition: none !important;
+  }
+}
+/* Guard control internals against contextual heading/sidebar text rules. */
+.sidebar nav .action.selected {
+  color: var(--action-text);
+}
+.select-control.select-control {
+  color: var(--action-text);
+  margin: 0;
+  font-size: 11px;
+  letter-spacing: 0;
+}
+.select-control > .select-orb {
+  display: grid;
+  place-items: center;
+  margin: 0;
+  padding: 0;
+  color: var(--action-on-accent);
+  font-size: inherit;
+}
+.select-control > .select-orb > svg {
+  display: block;
+  position: static;
+  margin: 0;
+  color: var(--action-on-accent);
+  width: 15px;
+  height: 15px;
+}
+.action.pill {
+  --control-size: 52px;
+  font-size: 17px;
+}
+.hero .action.pill {
+  --control-size: 52px;
+}
+.action.pill .action-label {
+  padding-inline: 24px;
+}
+.action.nav-cta {
+  font-size: 12px;
+}
+.action.nav-link {
+  font-size: 11px;
+}
+.action.text-link {
+  --control-size: 36px;
+  font-size: 12px;
+}
+.workspace .action {
+  font-size: 11px;
+}
+.workspace .heading-actions .action {
+  font-size: 11px;
+}
+.sidebar nav .action {
+  font-size: 11px;
+}
+.sidebar-bottom > .action .action-label {
+  font-size: 10px;
+}
+.modal .action.full {
+  font-size: 14px;
+}
+.form-stack > .action {
+  font-size: 12px;
+}
+.faq-item > .action {
+  font-size: 13px;
+}
+@media (max-width: 1100px) {
+  .action.nav-link {
+    font-size: 10px;
+  }
+}
+@media (max-width: 580px) {
+  .action.nav-cta {
+    font-size: 10px;
+  }
+  .action.pill,
+  .hero .action.pill {
+    --control-size: 48px;
+    font-size: 15px;
+  }
+  .action.pill .action-label {
+    padding-inline: 20px;
+  }
+  .faq-item > .action {
+    font-size: 12px;
+  }
+  .select-control.select-control {
+    font-size: 10px;
+  }
+  .workspace .heading-actions .action {
+    font-size: 11px;
+  }
+}
+@media (pointer: coarse) {
+  .action.action-icon {
+    --control-size: 40px;
+  }
+  .action.mobile-menu {
+    --control-size: 40px;
+  }
+  .select-control {
+    --control-size: 38px;
+  }
+}
+/* Boolean and range controls share the same label/orb geometry. */
+.form-stack .checkbox-label {
+  --check-size: 34px;
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 7px;
+  min-height: 34px;
+  margin: 0;
+  padding: 0 0 0 13px;
+  color: var(--action-text);
+  font-size: 11px;
+  cursor: pointer;
+}
+.form-stack .checkbox-label::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0 calc(var(--check-size) + 7px) 0 0;
+  background: var(--action-surface);
+  transition: right 0.5s var(--action-ease);
+}
+.form-stack .checkbox-label input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  position: relative;
+  display: grid;
+  place-items: center;
+  order: 1;
+  flex: 0 0 var(--check-size);
+  width: var(--check-size);
+  height: var(--check-size);
+  min-width: var(--check-size);
+  margin: 0 0 0 auto;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--action-accent);
+  color: var(--action-on-accent);
+  cursor: pointer;
+  transition:
+    transform 0.5s var(--action-ease),
+    border-radius 0.5s var(--action-ease);
+}
+.form-stack .checkbox-label input[type="checkbox"]::after {
+  content: "+";
+  font-family: Arial, sans-serif;
+  font-weight: 400;
+  font-size: 19px;
+  line-height: 1;
+  display: block;
+  color: var(--action-on-accent);
+}
+.form-stack .checkbox-label input[type="checkbox"]:checked::after {
+  content: "✓";
+  font-size: 17px;
+}
+.form-stack
+  .checkbox-label:is(:hover, :focus-within, :has(input:checked))::before {
+  right: 0;
+}
+.form-stack
+  .checkbox-label:is(:hover, :focus-within, :has(input:checked))
+  input[type="checkbox"] {
+  border-radius: 0;
+  transform: translateX(-4px) scale(0.76);
+}
+.form-stack .checkbox-label:has(input:disabled) {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.form-stack input[type="range"] {
+  appearance: none;
+  -webkit-appearance: none;
+  height: 24px;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.form-stack input[type="range"]::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 0;
+  background: var(--action-surface);
+}
+.form-stack input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  margin-top: -8px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--action-accent);
+  transition:
+    border-radius 0.35s var(--action-ease),
+    transform 0.35s var(--action-ease);
+}
+.form-stack
+  input[type="range"]:is(:hover, :focus-visible)::-webkit-slider-thumb {
+  border-radius: 0;
+  transform: scale(0.85);
+}
+.form-stack input[type="range"]::-moz-range-track {
+  height: 4px;
+  border-radius: 0;
+  background: var(--action-surface);
+}
+.form-stack input[type="range"]::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--action-accent);
+  transition:
+    border-radius 0.35s var(--action-ease),
+    transform 0.35s var(--action-ease);
+}
+.form-stack input[type="range"]:is(:hover, :focus-visible)::-moz-range-thumb {
+  border-radius: 0;
+  transform: scale(0.85);
+}
+@media (prefers-reduced-motion: reduce) {
+  .checkbox-label::before,
+  .checkbox-label input[type="checkbox"] {
+    transition: none !important;
+  }
+  .form-stack input[type="range"]::-webkit-slider-thumb {
+    transition: none;
+  }
+  .form-stack input[type="range"]::-moz-range-thumb {
+    transition: none;
+  }
+}
+.action.action:hover,
+.action.action:focus-visible {
+  background: transparent;
+  color: var(--action-text);
+  box-shadow: none;
+  transform: none;
+}
+.footer > a.action {
+  color: var(--action-text);
+}
+
+/* The dark hero needs a light focus ring; controls elsewhere use olive. */
+.hero .action {
+  --action-focus: var(--action-accent);
+}

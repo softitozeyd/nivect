@@ -1,3 +1,4 @@
-# Local camera inference dependencies; install in a dedicated virtual environment.
-ultralytics==8.4.203
-opencv-python>=4.8
+fastapi==0.162.0
+uvicorn==0.54.0
+Pillow==13.0.0
+httpx==0.28.1

@@ -1,23 +1,11 @@
 package com.vision.qc.repository;
 
 import com.vision.qc.entity.BottleInspection;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.*;
+import java.util.*;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
-@Repository
-public interface BottleInspectionRepository extends JpaRepository<BottleInspection, Long> {
-
-    // Üretim hattına ve tarih aralığına göre sorgulama
-    List<BottleInspection> findByLineCodeAndInspectedAtBetween(
-            String lineCode, LocalDateTime start, LocalDateTime end);
-
+public interface BottleInspectionRepository extends JpaRepository<BottleInspection,Long>, JpaSpecificationExecutor<BottleInspection> {
     List<BottleInspection> findTop100ByOrderByInspectedAtDescIdDesc();
-
-    long countByOverallResult(String overallResult);
-
-    // Son hatalı (FAIL) ürünleri getirme
+    Optional<BottleInspection> findByEventId(UUID eventId);
     List<BottleInspection> findTop20ByOverallResultOrderByInspectedAtDesc(String overallResult);
 }
