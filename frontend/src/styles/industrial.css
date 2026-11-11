@@ -115,3 +115,11 @@ body { background: #eef2ee; color: #1b302c; }
 .camera-view { height: auto; min-height: 0; aspect-ratio: 4 / 3; }
 .camera-view video { width: 100%; height: 100%; }
 @media (max-width: 760px) { .camera-workspace { grid-template-columns: minmax(0, 1fr); } .camera-view { height: auto; min-height: 0; } }
+/* Give the live image the full available width; its height follows the camera. */
+.camera-workspace { grid-template-columns: minmax(0, 1fr); }
+.camera-sidebar { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 24px; }
+.camera-sidebar .camera-result-label, .camera-sidebar .camera-result { grid-column: 1; }
+.camera-sidebar .camera-divider { display: none; }
+.camera-sidebar .camera-steps { grid-column: 2; grid-row: 1 / span 2; }
+.camera-sidebar .camera-disclaimer { grid-column: 1 / -1; }
+@media (max-width: 760px) { .camera-sidebar { display: block; } }
