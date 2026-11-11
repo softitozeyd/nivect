@@ -4,6 +4,11 @@ server:
 spring:
   config:
     import: optional:file:.env[.properties]
+  flyway:
+    baseline-on-migrate: true
+    baseline-version: 0
+  codec:
+    max-in-memory-size: 2MB
   application:
     name: bottle-qc
 
@@ -17,13 +22,12 @@ spring:
       maximum-pool-size: 20
       minimum-idle: 5
       idle-timeout: 300000
-      connection-timeout: 20000
+      connection-timeout: 5000
 
   # 2. JPA & Hibernate Performans ve Batch Ayarları
   jpa:
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-      ddl-auto: update # Geliştirme ortamı için otomatik tablo oluşturma/güncelleme
+      ddl-auto: validate
     show-sql: false # Yüksek hız için SQL loglarını kapalı tutuyoruz
     properties:
       hibernate:
@@ -37,6 +41,8 @@ spring:
   # 3. Redis In-Memory Buffer Bağlantı Ayarları
   data:
     redis:
+      repositories:
+        enabled: false
       host: ${REDIS_HOST:localhost}
       port: ${REDIS_PORT:6379}
       password: ${REDIS_PASSWORD}
@@ -64,3 +70,13 @@ management:
   endpoint:
     health:
       show-details: never
+
+qc:
+  minimum-confidence: ${QC_MINIMUM_CONFIDENCE:0.65}
+  vision-url: ${QC_VISION_URL:http://127.0.0.1:9000}
+server.reactive.session:
+  timeout: 8h
+  cookie:
+    http-only: true
+    same-site: strict
+    secure: ${QC_SECURE_COOKIE:false}

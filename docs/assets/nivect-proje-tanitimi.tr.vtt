@@ -1,0 +1,35 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:06.500
+Nivect: PET şişeler için görsel kalite kontrol. Gerçek arayüz üzerinden ürün turu.
+
+00:00:06.500 --> 00:00:18.000
+Nivect, PET şişe kalite kontrolünü tek bir çalışma alanında toplar.
+
+00:00:18.000 --> 00:00:22.600
+Operatör hesabıyla çalışma alanına giriş yapın.
+
+00:00:22.600 --> 00:00:31.150
+Kaynak, hat ve zaman aralığına göre üretim kayıtlarını ve inceleme bekleyen sonuçları izleyin.
+
+00:00:31.150 --> 00:00:41.000
+PC kamerasını açın ve kontrol alanını hazırlayın. Model bekleniyorsa tespit başlatılamaz.
+KAMERA GÖSTERİMİ: KAYITLI PET VİDEOSU · GERÇEK MODEL TESPİTİ DEĞİLDİR
+
+00:00:41.000 --> 00:00:49.200
+Manuel bir test gönderin. Sonuç, veritabanına kaydedildikten sonra onaylanır.
+BU BÖLÜMDEKİ KAYITLAR MANUEL TEST VERİSİDİR
+
+00:00:49.200 --> 00:00:59.700
+MANUAL kaynağını seçin; kaydı filtreleyin, ayrıntılarını inceleyin ve CSV olarak dışa aktarın.
+MANUAL KAYITLAR KAMERA METRİKLERİNDEN AYRI TUTULUR
+
+00:00:59.700 --> 00:01:07.060
+Eğitilmiş PET modeli bağlandığında tespit başlatılabilir. Kendi kameranızda saha doğrulaması gerekir.
+MODEL DURUMU: AĞIRLIK DOSYASI BEKLENİYOR
+
+00:01:07.060 --> 00:01:19.060
+Eğitilmiş PET modeli bağlandığında: Görüntü → PET modeli → Karar → Kalıcı kayıt. Düşük güven REVIEW olarak ayrılır. Model ağırlığı şu anda bekleniyor.
+
+00:01:19.060 --> 00:01:26.060
+Sonraki adımlar: veriyi hazırlayın, modeli eğitin ve kendi kamera koşullarınızda doğrulayın. Kurulum ayrıntıları README dosyasında.

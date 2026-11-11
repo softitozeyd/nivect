@@ -1,3 +1,8 @@
+> VisionQC operator panel. The compatible local camera and backend setup is
+> documented in [visionqc/README.md](../../visionqc/README.md). The application
+> at ../../frontend uses a different backend contract; do not point this panel
+> at that secured backend or weaken its authentication.
+
 # VisionQC PET — Nivect frontend
 
 Mevcut açık mavi VisionQC arayüzü, [softitozeyd/nivect](https://github.com/softitozeyd/nivect) projesine uyarlanmıştır. Referans commit: `31c9ce15d179b1f6664b5e4b61de45da4ebd5f00` (27 Ekim 2026 incelemesi). Backend **Spring Boot / Java 21**'dir; FastAPI varsayımı kaldırılmıştır. Ürün Ron 88 PET su şişesidir.

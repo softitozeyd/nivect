@@ -1,60 +1,44 @@
 package com.vision.qc.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.vision.qc.dto.BottleInspectionDto;
-import com.vision.qc.repository.BottleInspectionRepository;
 import com.vision.qc.service.impl.BottleInspectionServiceImpl;
-import org.junit.jupiter.api.BeforeEach;
+import com.vision.qc.repository.BottleInspectionRepository;
+import com.vision.qc.entity.BottleInspection;
+import com.vision.qc.dto.BottleInspectionDto;
 import org.junit.jupiter.api.Test;
-import org.springframework.data.redis.core.ReactiveListOperations;
-import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
-import reactor.core.publisher.Mono;
-import reactor.core.publisher.Sinks;
 import reactor.test.StepVerifier;
-
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.mockito.ArgumentMatchers.anyString;
+import java.time.Instant;
+import java.util.*;
 import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.*;
+import org.springframework.test.util.ReflectionTestUtils;
 
 class BottleInspectionServiceTest {
-    private ReactiveListOperations<String, String> list;
-    private BottleInspectionServiceImpl service;
-
-    @BeforeEach
-    @SuppressWarnings("unchecked")
-    void setUp() {
-        ReactiveStringRedisTemplate redis = mock(ReactiveStringRedisTemplate.class);
-        list = mock(ReactiveListOperations.class);
-        when(redis.opsForList()).thenReturn(list);
-        service = new BottleInspectionServiceImpl(mock(BottleInspectionRepository.class),
-                redis, new ObjectMapper().findAndRegisterModules());
+    BottleInspectionDto sample(boolean found,double confidence,List<BottleInspectionDto.Defect> defects) {
+        return new BottleInspectionDto(UUID.randomUUID(),"line-1","pc-1",found,defects,confidence,"test-v1",BottleInspectionDto.Source.CAMERA,Instant.now());
     }
-
-    @Test
-    void waitsForRedisWriteBeforeReportingSuccess() {
-        Sinks.One<Long> written = Sinks.one();
-        when(list.rightPush(anyString(), anyString())).thenReturn(written.asMono());
-        AtomicBoolean completed = new AtomicBoolean();
-        StepVerifier.create(service.processInspection(sample()).doOnSuccess(value -> completed.set(true)))
-                .expectSubscription()
-                .then(() -> assertFalse(completed.get()))
-                .then(() -> written.tryEmitValue(1L))
-                .verifyComplete();
+    @Test void neverPassesMissingBottleOrLowConfidence() {
+        var ledger=new InspectionLedger(null,null,null,null);
+        ReflectionTestUtils.setField(ledger,"minimumConfidence",0.65);
+        assertEquals("REVIEW",ledger.verdict(sample(false,0.99,List.of())));
+        assertEquals("REVIEW",ledger.verdict(sample(true,0.4,List.of())));
+        assertEquals("FAIL",ledger.verdict(sample(true,0.9,List.of(BottleInspectionDto.Defect.underfill))));
+        assertEquals("PASS",ledger.verdict(sample(true,0.9,List.of())));
     }
-
-    @Test
-    void propagatesRedisFailureInsteadOfReturningSuccess() {
-        when(list.rightPush(anyString(), anyString()))
-                .thenReturn(Mono.error(new IllegalStateException("redis unavailable")));
-        StepVerifier.create(service.processInspection(sample()))
-                .expectErrorMessage("redis unavailable")
-                .verify();
+    @Test void waitsForDatabaseCommitAndPropagatesFailure() {
+        var ledger=mock(InspectionLedger.class);
+        var service=new BottleInspectionServiceImpl(ledger,mock(BottleInspectionRepository.class));
+        var dto=sample(true,0.9,List.of());
+        when(ledger.record(dto)).thenThrow(new IllegalStateException("database offline"));
+        StepVerifier.create(service.processInspection(dto)).expectErrorMessage("database offline").verify();
+        verify(ledger).record(dto);
     }
-
-    private BottleInspectionDto sample() {
-        return BottleInspectionDto.builder().lineCode("test-line")
-                .capOk(true).labelOk(true).liquidLevelOk(true).build();
+    @Test void exposesBoundedRecentHistoryInRepositoryOrder() {
+        var repo=mock(BottleInspectionRepository.class);
+        var one=BottleInspection.builder().id(2L).build();
+        var two=BottleInspection.builder().id(1L).build();
+        when(repo.findTop100ByOrderByInspectedAtDescIdDesc()).thenReturn(List.of(one,two));
+        var service=new BottleInspectionServiceImpl(mock(InspectionLedger.class),repo);
+        StepVerifier.create(service.getRecentInspections()).expectNext(one,two).verifyComplete();
+        verify(repo).findTop100ByOrderByInspectedAtDescIdDesc();
     }
 }

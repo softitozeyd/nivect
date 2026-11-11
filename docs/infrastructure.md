@@ -1,3 +1,5 @@
+> Bu belge önceki prototip altyapısının tarihsel notlarını da içerir. Güncel uygulama, kimlik doğrulama, kamera ve kalıcı kayıt akışı için [ürün rehberini](product.md), [API sözleşmesini](api.md) ve [README](../README.md) dosyasını esas alın. Redis List aktarımı yerine PostgreSQL commit onayı kullanılır.
+
 # Yerel gelistirme altyapisi
 
 Bu paket PostgreSQL, Redis ve MQTT broker ile Spring Boot backend'i calistirir.
