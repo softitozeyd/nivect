@@ -123,3 +123,5 @@ body { background: #eef2ee; color: #1b302c; }
 .camera-sidebar .camera-steps { grid-column: 2; grid-row: 1 / span 2; }
 .camera-sidebar .camera-disclaimer { grid-column: 1 / -1; }
 @media (max-width: 760px) { .camera-sidebar { display: block; } }
+
+.camera-counter-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
