@@ -28,9 +28,9 @@ async function main() {
       await page.getByRole("button", { name: id, exact: true }).click();
       const dialog = page.getByRole("dialog");
       await dialog.getByText(records[0].inspectedAt, { exact: true }).waitFor();
-      if (!(await dialog.getByLabel("Review outcome").isDisabled()) ||
-          !(await dialog.getByLabel("Operator note").isDisabled())) {
-        throw new Error("Live review controls are unexpectedly enabled");
+      if (await dialog.getByLabel("Review outcome").isDisabled() ||
+          await dialog.getByLabel("Operator note").isDisabled()) {
+        throw new Error("Review controls are unexpectedly disabled");
       }
       console.log(`PASS API record ${id} and its details are visible`);
     } else {

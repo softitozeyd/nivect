@@ -1,9 +1,7 @@
-> Historical VisionQC frontend, retained from backend/inspection-history and its
-> ancestor frontend/language-options, integration/frontend-backend and frontend/visionqc-demo branches.
-> The current Nivect UI is ../../frontend. This package runs separately in demo mode.
-> Its legacy live API adapter targets the pre-authentication boolean contract and
-> must be migrated before connecting it to the current secured backend. Do not
-> weaken backend authentication to make the historical adapter connect.
+> VisionQC operator panel. The compatible local camera and backend setup is
+> documented in [visionqc/README.md](../../visionqc/README.md). The application
+> at ../../frontend uses a different backend contract; do not point this panel
+> at that secured backend or weaken its authentication.
 
 # VisionQC PET — Nivect frontend
 

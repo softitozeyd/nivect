@@ -1,0 +1,11 @@
+.git
+.idea
+.env
+.env.*
+target
+*.pt
+*.zip
+snapshots
+venv
+__pycache__
+*.ipynb

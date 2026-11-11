@@ -83,7 +83,7 @@ describe("inspection domain", () => {
     expect(updated.review?.outcome).toBe("false-positive");
     expect(snapshotSchema.safeParse(await adapter.load()).success).toBe(true);
   });
-  it("retries reads, surfaces API errors and blocks unsupported review mutations", async () => {
+  it("retries reads, surfaces API errors and blocks invalid review identifiers", async () => {
     const fetchMock = vi.fn().mockRejectedValue(new Error("offline"));
     vi.stubGlobal("fetch", fetchMock);
     const api = new ApiAdapter();
@@ -98,7 +98,7 @@ describe("inspection domain", () => {
         note: "",
         at: new Date().toISOString(),
       }),
-    ).rejects.toThrow("operator reviews");
+    ).rejects.toThrow("Invalid inspection ID");
     expect(fetchMock).not.toHaveBeenCalled();
     vi.unstubAllGlobals();
   });

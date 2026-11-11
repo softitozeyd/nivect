@@ -88,9 +88,10 @@ export function EventTable({
                     >
                       {e.id}
                     </button>
+                    {e.productNumber && <small>{t("Product number")}: #{e.productNumber}</small>}
                     <small>{formatDate(e.timestamp, preferences.zone, language === "tr" ? "tr-TR" : "en-US")}</small>
                     {recommendations && (
-                      <small className="product-caption">{e.product}</small>
+                      <small className="product-caption">{t(e.product)}</small>
                     )}
                   </div>
                 </div>
@@ -301,7 +302,7 @@ export function EventDetail({
   const [busy, setBusy] = useState(false);
   const [failure, setFailure] = useState("");
   const [saved, setSaved] = useState(event.review);
-  const unavailable = mode !== "demo" || offline || !!error;
+  const unavailable = offline || !!error;
   async function save() {
     if (unavailable || busy) return;
     setFailure("");
@@ -332,8 +333,9 @@ export function EventDetail({
                 ],
               ]
             : []),
-          ["Product", event.product],
-          ["Line / Station", `${event.lineId} / ${event.stationId}`],
+          ["Product", t(event.product)],
+          ...(event.sessionId ? [["Production session", `#${event.sessionId}`], ["Product number", `#${event.productNumber}`]] : []),
+          ["Line / Station", `${t(event.lineId)} / ${t(event.stationId)}`],
           [
             mode === "demo" ? "AI prediction" : "Backend quality decision",
             `${t(event.category)} · ${event.confidence === null ? "—" : `${(event.confidence * 100).toFixed(1)}%`}`,
@@ -360,9 +362,7 @@ export function EventDetail({
                   "false-positive": "False positive",
                   flagged: "Flagged for review",
                 }[saved.outcome]
-              : mode === "api"
-                ? "Review status unavailable"
-                : "Not reviewed yet",
+              : "Not reviewed yet",
           ],
         ].map(([key, value]) => (
           <div key={key}>
@@ -372,7 +372,7 @@ export function EventDetail({
         ))}
       </div>
       {event.defects && (
-        <p className="notice">{t("All defects:")}{' '}{event.defects.map(t).join(" · ")}{t(". The backend does not distinguish missing caps from loose caps.")}{' '}</p>
+        <p className="notice">{t("All defects:")}{' '}{event.defects.map(t).join(" · ")}{event.id.startsWith("NIV-") ? t(". The backend does not distinguish missing caps from loose caps.") : null}{' '}</p>
       )}
       {event.imagePath && (
         <p className="muted">{t("The server file path is not an image download URL. It is not opened automatically because the backend provides no image access endpoint.")}{' '}</p>
@@ -381,7 +381,7 @@ export function EventDetail({
       <h3>{t("Operator review")}</h3>
       <p className="muted">
         {mode === "api"
-          ? t("Operator reviews are unavailable for live records.")
+          ? t("Reviews are saved locally. Operator identity is not verified.")
           : t("The AI prediction stays unchanged. Demo reviews are stored only for this session.")}
       </p>
       <label>{t("Review outcome")}{' '}<select
@@ -409,7 +409,7 @@ export function EventDetail({
         />
       </label>
       {mode === "api" && (
-        <p className="notice">{t("Live record changes are disabled until an approved API and authorization are available.")}{' '}</p>
+        <p className="notice">{t("This local development environment has no user authentication.")}{' '}</p>
       )}
       {failure && (
         <p role="alert" className="danger">
@@ -418,7 +418,7 @@ export function EventDetail({
       )}
       {confirm ? (
         <div className="notice">
-          <p>{t("Your review will be added to this demo quality record. Do you want to continue?")}{' '}</p>
+          <p>{mode === "demo" ? t("Your review will be added to this demo quality record. Do you want to continue?") : t("Save this operator review?")}{' '}</p>
           <button onClick={() => setConfirm(false)}>{t("Cancel")}</button>
           <button
             className="primary"
@@ -473,7 +473,7 @@ export function History() {
       <div className="section-top">
         <p className="muted">
           {failuresOnly
-            ? t("Latest 100 saved inspections · Filters apply to these records")
+            ? t("Latest 100 records from both sources · Filtering is local")
             : t("Session history of up to 500 records")}{" "}
           · {rows.length}{' '}{t("results")}{' '}</p>
         <ExportButton events={rows} />

@@ -251,7 +251,7 @@ export function InspectionFrame({
                 fill="#1d6b99"
                 fontSize="18"
                 fontFamily="Georgia"
-              >{t("RON 88")}{' '}</text>
+              >PET{' '}</text>
               <text
                 x="90"
                 y="175"

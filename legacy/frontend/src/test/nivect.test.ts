@@ -2,6 +2,8 @@ import { beforeEach, afterEach, it, expect, vi } from "vitest";
 import {
   ApiAdapter,
   failuresSchema,
+  modelDetectionsSchema,
+  toModelEvent,
   historySchema,
   toInspectionEvent,
   normalizeInspectedAt,
@@ -89,7 +91,7 @@ it("loads only confirmed read paths and labels coverage as failures-only", async
     .mockImplementation((url: string) =>
       Promise.resolve(
         new Response(
-          JSON.stringify(url.endsWith("/health") ? { status: "UP" } : [sample]),
+          JSON.stringify(url.endsWith("/health") ? { status: "UP" } : url.endsWith("/summary") ? { legacyFailureRecords: 1, cameraDetectionRecords: 0 } : (url.endsWith("/model-detections") || url.endsWith("/reviews")) ? [] : [sample]),
           { status: 200 },
         ),
       ),
@@ -105,6 +107,9 @@ it("loads only confirmed read paths and labels coverage as failures-only", async
   expect(fetchMock.mock.calls.map((call) => call[0]).sort()).toEqual([
     "/backend/actuator/health",
     "/backend/api/v1/inspections/failures",
+    "/backend/api/v1/model-detections",
+    "/backend/api/v1/reviews",
+    "/backend/api/v1/summary",
   ]);
 });
 it("keeps failure records when health is down, without inventing healthy cameras", async () => {
@@ -116,7 +121,8 @@ it("keeps failure records when health is down, without inventing healthy cameras
         Promise.resolve(
           url.endsWith("/health")
             ? new Response('{"status":"DOWN"}', { status: 503 })
-            : new Response(JSON.stringify([sample])),
+            : url.endsWith("/summary") ? new Response('{"legacyFailureRecords":1,"cameraDetectionRecords":0}')
+            : new Response(JSON.stringify((url.endsWith("/model-detections") || url.endsWith("/reviews")) ? [] : [sample])),
         ),
       ),
   );
@@ -139,14 +145,14 @@ it("does not retry access errors and does not silently replace invalid JSON with
     Promise.resolve(
       new Response(
         JSON.stringify(
-          url.endsWith("/health") ? { status: "UP" } : { events: [] },
+          url.endsWith("/health") ? { status: "UP" } : url.endsWith("/summary") ? { legacyFailureRecords: 1, cameraDetectionRecords: 0 } : { events: [] },
         ),
       ),
     ),
   );
   await expect(api.load()).rejects.toThrow("expected data contract");
 });
-it("honors cancellation and rejects invalid operator writes without any POST", async () => {
+it("honors cancellation and rejects invalid operator IDs without any write", async () => {
   const fetchMock = vi
     .fn()
     .mockImplementation(
@@ -163,15 +169,15 @@ it("honors cancellation and rejects invalid operator writes without any POST", a
   const promise = api.load(controller.signal);
   controller.abort();
   await expect(promise).rejects.toBeDefined();
-  expect(fetchMock).toHaveBeenCalledTimes(2);
+  expect(fetchMock).toHaveBeenCalledTimes(5);
   fetchMock.mockClear();
   await expect(
-    api.review("NIV-12", {
+    api.review("invalid", {
       outcome: "confirmed",
       note: "",
       at: new Date().toISOString(),
     }),
-  ).rejects.toThrow("no API");
+  ).rejects.toThrow("Invalid inspection ID");
   expect(fetchMock).not.toHaveBeenCalled();
 });
 
@@ -180,6 +186,34 @@ it("history accepts both results, rejects inconsistent rows and maps passes", as
   expect(historySchema.safeParse([sample, pass]).success).toBe(true);
   expect(historySchema.safeParse([{...pass, capOk: false}]).success).toBe(false);
   expect(toInspectionEvent(pass)).toMatchObject({decision: "pass", category: "Pass", defects: []});
-  vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(JSON.stringify([sample, pass]))));
+  vi.stubGlobal("fetch", vi.fn().mockImplementation((url: string) => Promise.resolve(new Response(JSON.stringify((url.endsWith("/model-detections") || url.endsWith("/reviews")) ? [] : [sample, pass])))));
   expect((await new ApiAdapter().history()).map(row => row.decision)).toEqual(["reject", "pass"]);
+});
+
+it("includes camera detections in overview and history without fabricating checks", async () => {
+  const detection = { id: 2, defects: "missing_cap,underfill", recordedAt: "2026-10-27T12:00:01Z" };
+  expect(modelDetectionsSchema.safeParse([detection]).success).toBe(true);
+  expect(modelDetectionsSchema.safeParse([{...detection, defects: "label_damage"}]).success).toBe(false);
+  const event = toModelEvent(detection);
+  expect(event).toMatchObject({id: "MD-2", category: "Multiple defects", defects: ["Missing cap", "Underfill"], decision: "reject", confidence: null});
+  expect(event.checks).toBeUndefined();
+  vi.stubGlobal("fetch", vi.fn().mockImplementation((url: string) => Promise.resolve(new Response(JSON.stringify(url.endsWith("/health") ? {status: "UP"} : url.endsWith("/summary") ? {legacyFailureRecords:1,cameraDetectionRecords:1} : url.endsWith("/model-detections") ? [detection] : url.endsWith("/reviews") ? [] : [sample])))));
+  const api = new ApiAdapter();
+  expect((await api.load()).events.map(e => e.id)).toContain("MD-2");
+  expect((await api.history()).map(e => e.id)).toContain("MD-2");
+});
+
+it("loads saved reviews and writes review updates through the API", async () => {
+  const row = {id: 9, defects: "underfill", recordedAt: "2026-10-27T12:00:01Z"};
+  const persisted = {recordId: "MD-9", outcome: "confirmed", note: "checked", updatedAt: "2026-10-27T12:01:00Z"};
+  const fetchMock = vi.fn().mockImplementation((url: string, init: RequestInit = {}) => {
+    if (init.method === "PUT") return Promise.resolve(new Response(JSON.stringify(persisted)));
+    const value = url.endsWith("/health") ? {status:"UP"} : url.endsWith("/summary") ? {legacyFailureRecords:0,cameraDetectionRecords:1} : url.endsWith("/reviews") ? [persisted] : url.endsWith("/model-detections") ? [row] : [];
+    return Promise.resolve(new Response(JSON.stringify(value)));
+  });
+  vi.stubGlobal("fetch", fetchMock);
+  const api = new ApiAdapter();
+  expect((await api.load()).events[0].review).toEqual({outcome:"confirmed",note:"checked",at:persisted.updatedAt});
+  await api.review("MD-9", {outcome:"flagged",note:"check",at:new Date().toISOString()});
+  expect(fetchMock).toHaveBeenCalledWith("/api/v1/reviews/MD-9", expect.objectContaining({method:"PUT",body:JSON.stringify({outcome:"flagged",note:"check"})}));
 });

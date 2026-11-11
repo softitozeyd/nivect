@@ -6,6 +6,10 @@
 
 **PET şişe üretim hatları için kamera tabanlı kalite kontrol.**
 
+Operatör ekibinin kullandığı VisionQC kamera paneli ve onunla uyumlu yerel
+servisler için [VisionQC kurulumuna](visionqc/README.md) bakın. Kök dizindeki
+uygulama ayrı bir sürümdür; iki sürümün verileri birbirinden bağımsızdır.
+
 VisionQC, operatörün PET şişeleri kamera ile incelemesini, kapak ve dolum
 kusurlarına ilişkin kararları izlemesini ve inceleme kayıtlarını dışa aktarmasını
 sağlar. İlk kapsam, kontrol alanından tek tek geçen şişelerde düşük dolum,

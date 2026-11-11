@@ -1,5 +1,5 @@
 import { useLanguage, useT } from '../i18n';
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import {
   ArrowUpRight,
@@ -34,6 +34,19 @@ import {
 } from "../components/ui";
 import { EventTable, EventDetail, ExportButton } from "../components/events";
 import { petProduct } from "../services/nivect";
+import { CameraPanel } from "../components/camera";
+import { useProductionSession } from "../services/production";
+function ProductionSummary() {
+  const {language} = useLanguage();
+  const tr = language === "tr";
+  const {production, sessionError} = useProductionSession();
+  const rejected = production ? production.defectCount + production.uncertainCount : 0;
+  return <section className="production-overview panel">
+    <div className="production-counters-heading"><strong>{tr ? "Son üretim oturumu" : "Latest production session"}{production ? ` #${production.id}` : ""}</strong><span>{sessionError ? (tr ? "Bağlantı hatası" : "Connection error") : production?.active ? (tr ? "Oturum açık" : "Session open") : production ? (tr ? "Tamamlandı" : "Completed") : (tr ? "Henüz oturum yok" : "No session yet")}</span></div>
+    <div className="production-counter-grid"><div><small>{tr ? "Toplam" : "Total"}</small><strong>{production?.totalCount ?? "—"}</strong></div><div><small>{tr ? "Uygun" : "Pass"}</small><strong>{production?.passCount ?? "—"}</strong></div><div><small>{tr ? "Hatalı" : "Defective"}</small><strong>{production ? rejected : "—"}</strong></div></div>
+    <p>{tr ? "Yerel kamera testi: kararsız sonuçlar hatalı sayısına dahildir. Fiziksel ayırma yapılmaz." : "Local camera test: uncertain results are included in the defective count. No physical rejection is performed."}</p>
+  </section>;
+}
 function MetricRow({ events }: { events: InspectionEvent[] }) {
   const t = useT();
   const { language } = useLanguage();
@@ -47,6 +60,7 @@ function MetricRow({ events }: { events: InspectionEvent[] }) {
       0,
     ) || 0,
   );
+  if (failuresOnly) return <div className="metric-grid single-metric"><MetricCard label={t("FILTERED DEFECT RECORDS")} value={String(m.defective)} unit={t("units")} detail={t("From the available recent records")} negative /></div>;
   return (
     <div className="metric-grid">
       <MetricCard
@@ -66,7 +80,7 @@ function MetricRow({ events }: { events: InspectionEvent[] }) {
         value={String(m.defective)}
         unit={t("units")}
         detail={
-          failuresOnly ? t("Within the latest 20 FAIL records") : t("Flagged by AI")
+          failuresOnly ? t("Recent failure records · Includes local camera detections") : t("Flagged by AI")
         }
         negative
       />
@@ -108,6 +122,7 @@ export function Overview() {
   );
   const events = snapshot?.events || [];
   const summary = metrics(events);
+  const totalSavedDefects = snapshot?.summary ? snapshot.summary.legacyFailureRecords + snapshot.summary.cameraDetectionRecords : null;
   const chartEnd = Date.parse(snapshot?.updatedAt || "") || 0;
   const stations = snapshot?.stations || [];
   const active = stations.filter(
@@ -148,16 +163,17 @@ export function Overview() {
     .reduce((n, s) => n + s.fps, 0);
   return (
     <>
-      <div className="context-strip">
+      {mode === "api" && <ProductionSummary />}
+      {mode !== "api" && <div className="context-strip">
         <div>
           <span className={healthy ? "pulse-dot" : "warning-dot"} />
           <strong>
             {failuresOnly
-              ? t("Nivect · Latest failure records")
+              ? t("Recent defect records")
               : t("Production Line 01")}
           </strong>
           <span className="divider" />
-          {petProduct}
+          {t(petProduct)}
         </div>
         <Badge
           tone={
@@ -174,20 +190,20 @@ export function Overview() {
                   ? t("Simulation active")
                   : t("Monitoring active")}
         </Badge>
-      </div>
-      <MetricRow events={events} />
+      </div>}
+      {mode !== "api" && <MetricRow events={events} />}
       <div className="overview-layout">
         <div className="overview-main">
           <section className="panel recommendation-panel">
             <div className="panel-heading">
               <div>
                 <h2>
-                  {failuresOnly ? t("Inspection center") : t("AI inspection center")}{" "}
-                  <span className="count">{summary.total}</span>
+                  {failuresOnly ? t("Saved defect records") : t("AI inspection center")}{" "}
+                  <span className="count">{failuresOnly ? (totalSavedDefects ?? "—") : summary.total}</span>
                 </h2>
                 <p>
                   {failuresOnly
-                    ? t("Spring Boot quality decisions · latest 20 FAIL records")
+                    ? t("Total saved defects from both sources; recent records are shown below.")
                     : t("Latest inspections · AI decisions and operator review queue")}
                 </p>
               </div>
@@ -208,7 +224,7 @@ export function Overview() {
                     key={option.value}
                     disabled={
                       failuresOnly &&
-                      (option.value === "pass" || option.value === "pending")
+                      option.value === "pass"
                     }
                     aria-pressed={queue === option.value}
                     onClick={() => setQueue(option.value)}
@@ -229,7 +245,7 @@ export function Overview() {
               </Link>
             </div>
           </section>
-          <section className="panel quality-panel">
+          {!failuresOnly && <section className="panel quality-panel">
             <div className="panel-heading">
               <div>
                 <h2>{t("Inspection summary")}</h2>
@@ -247,7 +263,7 @@ export function Overview() {
               <div
                 className="quality-ring"
                 style={{
-                  background: `conic-gradient(#0da7e3 ${failuresOnly ? 0 : passRate}%, #dcecf8 0)`,
+                  background: `conic-gradient(var(--quality-fill, #0da7e3) ${failuresOnly ? 0 : passRate}%, var(--quality-track, #dcecf8) 0)`,
                 }}
                 role="img"
                 aria-label={
@@ -281,10 +297,10 @@ export function Overview() {
             </div>
             <p className="card-footnote">
               {failuresOnly
-                ? t("Production defect rate and model accuracy cannot be calculated from the latest 20 failures.")
+                ? t("Production defect rate and model accuracy cannot be calculated from failure-only records.")
                 : t("This is not a model accuracy measurement; labeled ground truth is required.")}
             </p>
-          </section>
+          </section>}
           <section className="panel activity-panel">
             <div className="panel-heading">
               <div>
@@ -295,7 +311,7 @@ export function Overview() {
                 </h2>
                 <p>
                   {failuresOnly
-                    ? t("Received FAIL records over the last 3 hours")
+                    ? t("Recent recorded failures")
                     : t("Last 3 hours · 15-minute production intervals")}
                 </p>
               </div>
@@ -314,11 +330,11 @@ export function Overview() {
               </div>
               <div>
                 <small>{t("REVIEWED")}</small>
-                <strong>{failuresOnly ? "—" : reviewed}</strong>
+                <strong>{reviewed}</strong>
               </div>
               <div>
                 <small>{t("PENDING")}</small>
-                <strong>{failuresOnly ? "—" : pending.length}</strong>
+                <strong>{pending.length}</strong>
               </div>
             </div>
             <div className="chart-bottom">
@@ -330,23 +346,23 @@ export function Overview() {
         <div className="overview-rail">
           <section className="panel health-panel">
             <div className="panel-heading">
-              <h2>{failuresOnly ? t("Backend health") : t("Station health")}</h2>
+              <h2>{failuresOnly ? t("System connection") : t("Station health")}</h2>
               <Cpu size={17} />
             </div>
             <div className="health-headline">
               <small>
                 {failuresOnly
-                  ? t("SPRING BOOT / ACTUATOR")
+                  ? t("DATA SERVICE")
                   : t("TOTAL PROCESSING SPEED")}
               </small>
               <div>
                 <strong>
                   {failuresOnly
-                    ? backendStatus
+                    ? t(backendStatus)
                     : offline || error
                       ? "—"
                       : totalFps}
-                  <span>{failuresOnly ? t("HTTP") : t("FPS")}</span>
+                  {!failuresOnly && <span>{t("FPS")}</span>}
                 </strong>
                 <Badge
                   tone={
@@ -367,7 +383,7 @@ export function Overview() {
               </div>
               <p>
                 {failuresOnly
-                  ? t("Backend health does not verify camera or model health.")
+                  ? t("Connection status does not verify camera or model readiness.")
                   : t("Camera and inference connection status")}
               </p>
             </div>
@@ -398,7 +414,7 @@ export function Overview() {
                 <strong>
                   {[...new Set(stations.map((s) => s.modelVersion))].join(
                     ", ",
-                  ) || "Unknown"}
+                  ) || t("Unknown")}
                 </strong>
               </span>
               <span className="soft-label">
@@ -502,6 +518,7 @@ export function Monitoring() {
   }
   return (
     <>
+      {mode === "api" && <CameraPanel />}
       <div className="section-top">
         <label>
           {failuresOnly ? t("Select line") : t("Select station")}
@@ -538,12 +555,12 @@ export function Monitoring() {
             ))}
           </select>
         </label>
-        <button onClick={toggle} disabled={!event}>
+        {mode === "demo" && <button onClick={toggle} disabled={!event}>
           {paused ? <Play size={16} /> : <Pause size={16} />}{" "}
           {paused ? t("Resume view") : t("Pause view")}
-        </button>
+        </button>}
       </div>
-      <div className="monitor-grid">
+      {mode === "demo" && <div className="monitor-grid">
         <section className="panel">
           <div className="panel-heading">
             <h2>
@@ -573,7 +590,7 @@ export function Monitoring() {
                   ? t("Disconnected")
                   : paused
                     ? t("View paused")
-                    : t("Camera feed unavailable")
+                    : t("Backend camera status unavailable")
                 : health !== "active"
                   ? t(statusLabels[health])
                   : paused
@@ -632,7 +649,7 @@ export function Monitoring() {
             </button>
           )}
         </section>
-      </div>
+      </div>}
       <section className="panel">
         <div className="panel-heading">
           <h2>
@@ -655,8 +672,36 @@ export function Stations() {
   const t = useT();
   const { language } = useLanguage();
   const { snapshot, offline, error, preferences, now, mode } = useApp();
+  const [localModel, setLocalModel] = useState<"checking" | "ready" | "unavailable">("checking");
+  const [localDevice, setLocalDevice] = useState("");
+  useEffect(() => {
+    if (mode !== "api") return;
+    const controller = new AbortController();
+    let timer: ReturnType<typeof setTimeout>;
+    async function check() {
+      try {
+        const response = await fetch("http://127.0.0.1:8765/health", {signal: AbortSignal.any([controller.signal, AbortSignal.timeout(4000)])});
+        if (!response.ok) throw new Error();
+        const value: unknown = await response.json();
+        if (!value || typeof value !== "object" || !("status" in value) || value.status !== "ready") throw new Error();
+        if (!controller.signal.aborted) {
+          setLocalModel("ready");
+          setLocalDevice("device" in value && typeof value.device === "string" ? value.device : "");
+        }
+      } catch { if (!controller.signal.aborted) { setLocalModel("unavailable"); setLocalDevice(""); } }
+      if (!controller.signal.aborted) timer = setTimeout(check, 10000);
+    }
+    void check();
+    return () => { controller.abort(); clearTimeout(timer); };
+  }, [mode]);
   return (
     <>
+      {mode === "api" && <section className="panel" style={{marginBottom: 16}}>
+        <h2>{t("Local model service")}</h2>
+        <Badge tone={localModel === "ready" ? "success" : "warning"}>{t(localModel === "ready" ? "Model service ready" : localModel === "checking" ? "Checking model service" : "Model service unavailable")}</Badge>
+        {localModel === "ready" && <p>{t("Inference device")}: {localDevice === "cpu" ? "CPU" : localDevice ? `GPU ${localDevice}` : t("Unknown")}</p>}
+        <p>{t("The camera opens only on the live monitoring page. This status does not verify camera hardware.")}</p>
+      </section>}
       <p className="muted">{t("Stations are monitored in read-only mode.")}{" "}
         {mode === "demo"
           ? t("Connections are simulated in the demo environment.")
@@ -949,7 +994,7 @@ export function Settings() {
           <strong>
             {mode === "demo"
               ? t("Local simulation")
-              : t("Live API (Nivect contract)")}
+              : t("Live data source")}
           </strong>
         </p>
         <div className="notice">
@@ -976,7 +1021,7 @@ export function Settings() {
         </button>
         <hr />
         <h3>{t("Integration scope")}</h3>
-        <p className="muted">{t("The Nivect Spring Boot address is configured through the development proxy (default port 8080). Approved APIs for user management, camera configuration, and model updates are not available.")}{' '}</p>
+        <p className="muted">{t("User management, camera settings, and model updates are not available yet.")}{' '}</p>
         <Badge tone="warning">{t("Advanced configuration unavailable")}</Badge>
         <p className="muted">{t("OCR / batch and expiry date inspection: Phase 2.")}{' '}</p>
       </section>

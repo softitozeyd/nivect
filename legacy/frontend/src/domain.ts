@@ -11,6 +11,7 @@ export const categories = [
   "Label defect",
   "Fill level defect",
   "Multiple defects",
+  "Uncertain",
 ] as const;
 export const reviewSchema = z.object({
   outcome: z.enum(["confirmed", "false-positive", "flagged"]),
@@ -20,6 +21,8 @@ export const reviewSchema = z.object({
 export const eventSchema = z.object({
   id: z.string(),
   timestamp: z.string().datetime(),
+  sessionId: z.number().int().positive().optional(),
+  productNumber: z.number().int().positive().optional(),
   stationId: z.string(),
   lineId: z.string(),
   product: z.string(),
@@ -99,6 +102,7 @@ export const snapshotSchema = z.object({
   updatedAt: z.string().datetime(),
   coverage: z.enum(["session", "failures-only"]).optional(),
   backendHealth: z.enum(["UP", "DOWN", "UNKNOWN"]).optional(),
+  summary: z.object({ legacyFailureRecords: z.number().int().nonnegative(), cameraDetectionRecords: z.number().int().nonnegative() }).optional(),
 });
 export type Snapshot = z.infer<typeof snapshotSchema>;
 export interface Filters {

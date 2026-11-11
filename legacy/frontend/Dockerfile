@@ -3,7 +3,8 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci
 COPY . .
-RUN npm run build
+ARG VISIONQC_BUILD_MODE=demo
+RUN if [ "$VISIONQC_BUILD_MODE" = "api" ]; then npm run build:api; else npm run build; fi
 
 FROM nginx:stable-alpine
 COPY nginx.conf /etc/nginx/conf.d/default.conf
